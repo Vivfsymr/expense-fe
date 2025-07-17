@@ -11,7 +11,7 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     async login(username: string, password: string) {
       const res = await axios.post(`${API_URL}/users/login`, { username, password });
-      if (res.data.success && res.data.user) {
+      if (res.data) {
         this.user = res.data.user;
         localStorage.setItem('user', JSON.stringify(this.user));
       } else {
