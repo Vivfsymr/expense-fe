@@ -244,6 +244,7 @@ export const onDelete = async (id: string) => {
   try {
     await expenseService.delete(id);
     await fetchExpenses();
+    await fetchRealExpenses();
   } finally {
     loading.value = false;
   }
@@ -303,6 +304,7 @@ export const onDeleteIncome = async (id: string) => {
   try {
     await axios.delete(`${API_BASE_URL}/incomes/${id}`);
     await fetchIncome();
+    await fetchRealExpenses();
   } finally {
     loading.value = false;
   }
