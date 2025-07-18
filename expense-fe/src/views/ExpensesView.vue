@@ -138,16 +138,4 @@ const activeTab = ref('expenses');
 
 useExpensesInit();
 
-watch([selectedIncomeUserId, filterMonth], () => {
-  if (activeTab.value === 'income') fetchIncome();
-});
-
-watch(activeTab, (tab) => {
-  if (tab === 'income') {
-    if (!selectedIncomeUserId.value && users.value.length > 0) {
-      selectedIncomeUserId.value = users.value[0].id;
-    }
-    fetchIncome();
-  }
-});
 </script> 

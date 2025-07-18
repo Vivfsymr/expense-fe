@@ -179,9 +179,11 @@ export const useExpensesInit = () => {
     fetchUsers();
     fetchCategories();
     fetchStatuses();
+    fetchIncome();
   });
   watch([selectedUserId, filterMonth], () => {
     fetchExpenses();
+    fetchIncome();
     fetchRealExpenses();
   });
 };
