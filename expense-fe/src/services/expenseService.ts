@@ -4,25 +4,32 @@ import { API_BASE_URL } from '../config';
 const API_URL = `${API_BASE_URL}/expenses`;
 
 export const expenseService = {
-  getAll() {
-    return axios.get(API_URL);
+  async getAll() {
+    const res = await axios.get(API_URL);
+    return res.data.data;
   },
-  getById(id: string) {
-    return axios.get(`${API_URL}/${id}`);
+  async getById(id: string) {
+    const res = await axios.get(`${API_URL}/${id}`);
+    return res.data.data;
   },
-  getByUser(userId: string) {
-    return axios.get(`${API_URL}/user/${userId}`);
+  async getByUser(userId: string) {
+    const res = await axios.get(`${API_URL}/user/${userId}`);
+    return res.data.data;
   },
-  getByForUser(forUserId: string) {
-    return axios.get(`${API_URL}/for-user/${forUserId}`);
+  async getByForUser(forUserId: string) {
+    const res = await axios.get(`${API_URL}/for-user/${forUserId}`);
+    return res.data.data;
   },
-  create(data: any) {
-    return axios.post(API_URL, data);
+  async create(data: any) {
+    const res = await axios.post(API_URL, data);
+    return res.data;
   },
-  update(id: string, data: any) {
-    return axios.put(`${API_URL}/${id}`, data);
+  async update(id: string, data: any) {
+    const res = await axios.put(`${API_URL}/${id}`, data);
+    return res.data;
   },
-  delete(id: string) {
-    return axios.delete(`${API_URL}/${id}`);
+  async delete(id: string) {
+    const res = await axios.delete(`${API_URL}/${id}`);
+    return res.data;
   },
 }; 

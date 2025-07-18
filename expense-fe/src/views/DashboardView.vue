@@ -23,8 +23,8 @@ const currentMonth = dayjs().format('MM/YYYY');
 
 const fetchExpenses = async () => {
   if (!auth.user) return;
-  const res = await expenseService.getByUser(auth.user.id);
-  expenses.value = res.data;
+  const res = await expenseService.getByUser(auth.user.id);ư
+  expenses.value = res;
 };
 
 const filteredExpenses = computed(() => {

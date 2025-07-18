@@ -2,12 +2,10 @@
   <div class="app-header">
     <div class="header-left">
       <img src="/favicon.ico" alt="Logo" class="header-logo" />
-      <span class="header-title">Expense Manager</span>
+      <span class="header-title">Khi bé Dung quản lí tri tiêu</span>
     </div>
     <a-menu mode="horizontal" :selectedKeys="[selectedKey]" class="header-menu" @click="onMenuClick">
       <a-menu-item key="expenses">Chi tiêu</a-menu-item>
-      <a-menu-item key="users">Users</a-menu-item>
-      <a-menu-item key="dashboard">Dashboard</a-menu-item>
     </a-menu>
     <div class="header-user" v-if="user">
       <a-avatar :size="32" style="margin-right: 8px; background: #1677ff;">

@@ -46,7 +46,12 @@ const fetchUsers = async () => {
   loading.value = true;
   try {
     const res = await axios.get('/api/users');
-    users.value = res.data;
+    if (res.data && res.data.success) {
+      users.value = res.data.data;
+    } else {
+      users.value = [];
+      // Có thể hiển thị thông báo lỗi ở đây nếu muốn
+    }
   } finally {
     loading.value = false;
   }
