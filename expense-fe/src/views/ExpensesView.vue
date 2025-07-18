@@ -48,7 +48,7 @@
           </a-table>
           <a-empty v-if="!filteredExpenses.length && !loading" description="Không có chi tiêu trong tháng này" :class="$style.empty" />
         </a-card>
-        <a-modal v-model:open="dialogVisible" :title="editId ? 'Sửa chi tiêu' : 'Thêm chi tiêu'" @ok="onSubmit" @cancel="() => dialogVisible = false">
+        <a-modal v-model:open="dialogVisible" :title="editId ? 'Sửa chi tiêu' : 'Thêm chi tiêu'" @ok="onSubmit" @cancel="() => dialogVisible = false" :confirm-loading="loading" :ok-button-props="{ disabled: loading }">
           <a-form :model="form" layout="vertical">
             <a-form-item label="Ngày">
               <a-date-picker v-model:value="form.date" style="width: 100%;" />
@@ -101,7 +101,7 @@
           </a-table>
           <a-empty v-if="!filteredIncome.length && !loading" description="Không có thu nhập trong tháng này" :class="$style.empty" />
         </a-card>
-        <a-modal v-model:open="dialogVisibleIncome" :title="editIncomeId ? 'Sửa thu nhập' : 'Thêm thu nhập'" @ok="onSubmitIncome" @cancel="() => dialogVisibleIncome = false">
+        <a-modal v-model:open="dialogVisibleIncome" :title="editIncomeId ? 'Sửa thu nhập' : 'Thêm thu nhập'" @ok="onSubmitIncome" @cancel="() => dialogVisibleIncome = false" :confirm-loading="loading" :ok-button-props="{ disabled: loading }">
           <a-form :model="incomeForm" layout="vertical">
             <a-form-item label="Ngày">
               <a-date-picker v-model:value="incomeForm.date" style="width: 100%;" />
