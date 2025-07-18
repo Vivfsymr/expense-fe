@@ -85,7 +85,7 @@
             <div>Tổng thu nhập: {{ totalIncomeAmount.toLocaleString() }} đ</div>
             <a-button type="primary" @click="openAddIncome">Thêm thu nhập</a-button>
           </div>
-          <a-table :dataSource="filteredIncome" :columns="columns" :loading="loading" rowKey="id" :pagination="{ pageSize: 10 }" :class="$style.table">
+          <a-table :dataSource="filteredIncome" :columns="incomeColumns" :loading="loading" rowKey="id" :pagination="{ pageSize: 10 }" :class="$style.table">
             <template #bodyCell="{ column, record }">
               <template v-if="column.key === 'category'">
                 {{ getCategoryName(record.category) }}
@@ -127,7 +127,7 @@
 
 <script setup lang="ts">
 import {
-  expenses, users, categories, statuses, selectedUserId, filterMonth, filterCategory, filterStatus, dialogVisible, editId, form, loading, columns, filteredExpenses, getCategoryName, getStatusName, openAdd, openEdit, onSubmit, onDelete, useExpensesInit, totalAmount, formatCurrency, parseCurrency,
+  expenses, users, categories, statuses, selectedUserId, filterMonth, filterCategory, filterStatus, dialogVisible, editId, form, loading, columns, incomeColumns, filteredExpenses, getCategoryName, getStatusName, openAdd, openEdit, onSubmit, onDelete, useExpensesInit, totalAmount, formatCurrency, parseCurrency,
   income, selectedIncomeUserId, fetchIncome, filteredIncome, totalIncomeAmount,
   dialogVisibleIncome, editIncomeId, incomeForm, openAddIncome, openEditIncome, onSubmitIncome, onDeleteIncome, realExpenses
 } from './ExpensesView.logic';
