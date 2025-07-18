@@ -61,8 +61,8 @@
                 v-model:value="form.amount"
                 style="width: 100%;"
                 placeholder="Nhập số tiền"
-                :formatter="value => formatCurrency(value)"
-                :parser="value => parseCurrency(value)"
+                :formatter="(value: any) => formatCurrency(value)"
+                :parser="(value: any) => parseCurrency(value)"
               />
             </a-form-item>
             <a-form-item label="Danh mục">
@@ -114,8 +114,8 @@
                 v-model:value="incomeForm.amount"
                 style="width: 100%;"
                 placeholder="Nhập số tiền"
-                :formatter="value => formatCurrency(value)"
-                :parser="value => parseCurrency(value)"
+                :formatter="(value: any) => formatCurrency(value)"
+                :parser="(value: any) => parseCurrency(value)"
               />
             </a-form-item>
           </a-form>
@@ -144,8 +144,8 @@ watch([selectedIncomeUserId, filterMonth], () => {
 
 watch(activeTab, (tab) => {
   if (tab === 'income') {
-    if (!selectedIncomeUserId.value && users.length > 0) {
-      selectedIncomeUserId.value = users[0].id;
+    if (!selectedIncomeUserId.value && users.value.length > 0) {
+      selectedIncomeUserId.value = users.value[0].id;
     }
     fetchIncome();
   }
