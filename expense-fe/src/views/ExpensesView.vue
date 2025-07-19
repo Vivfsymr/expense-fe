@@ -1,18 +1,16 @@
-
-
 <template>
   <div :class="$style.wrapper">
     <div style="flex-direction: row; display: flex; justify-content: space-between; align-items: center;">
-      <div style="margin-bottom: 16px; font-size: 16px; font-weight: bold; color: #1890ff;">
+      <div style="margin-bottom: 16px; font-size: 16px; font-weight: bold; color: #18ff8b;">
         Số tiền còn lại: {{ realExpenses.toLocaleString() }} đ
       </div>
       <div :class="$style.filterRow">
+        <a-date-picker v-model:value="filterMonth" picker="month" format="MM/YYYY" style="width: 160px; margin-right: 12px;" />
         <a-select v-model:value="selectedUserId" style="width: 180px; margin-right: 12px;" placeholder="Chọn người dùng">
           <a-select-option v-for="u in users" :key="u.id" :value="u.id">
             {{ u.name }}
           </a-select-option>
         </a-select>
-        <a-date-picker v-model:value="filterMonth" picker="month" format="MM/YYYY" style="width: 160px; margin-right: 12px;" />
       </div>
       </div>
     <a-tabs v-model:activeKey="activeTab">
@@ -32,13 +30,18 @@
               </div>
               <a-button type="primary" @click="openAdd">Thêm chi tiêu</a-button>
             </div>
-            <div>Tổng số tiền: {{ totalAmount.toLocaleString() }} đ</div>
+            <div style="color: #00831c;">Tổng số tiền: {{ totalAmount.toLocaleString() }} đ</div>
           </div>
           <div class="scroll-table">
             <a-table :dataSource="filteredExpenses" :columns="columns" :loading="loading" rowKey="id" :pagination="false" :class="$style.table">
               <template #bodyCell="{ column, record }">
                 <template v-if="column.key === 'category'">
-                  {{ getCategoryName(record.category) }}
+                  <span
+                    :data-category="getCategoryName(record.category)"
+                    :style="{ color: '#fff', padding: '2px 10px', borderRadius: '8px', fontWeight: 500 }"
+                  >
+                    {{ getCategoryName(record.category) }}
+                  </span>
                 </template>
                 <template v-else-if="column.key === 'status'">
                   {{ getStatusName(record.status) }}
@@ -167,12 +170,71 @@ watch(() => auth.user, async (newUser, oldUser) => {
   position: sticky;
   top: 0;
   z-index: 2;
-  background: #18191a;
+  background: #fff;
   padding-top: 8px;
   padding-bottom: 8px;
 }
 .scroll-table {
   max-height: 630px;
   overflow-y: auto;
+}
+:deep(.ant-table-thead > tr > th),
+:deep(.ant-table-tbody > tr > td) {
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
+  padding-left: 6px !important;
+  padding-right: 6px !important;
+  font-size: 12px !important;
+}
+:deep(.ant-table-tbody > tr > td) {
+  line-height: 1.05 !important;
+}
+:deep(.ant-table-tbody .ant-table-cell span[data-category="Ăn uống"]) {
+  background: #43e97b !important;
+}
+:deep(.ant-table-tbody .ant-table-cell span[data-category="Mua sắm"]) {
+  background: #f7971e !important;
+}
+:deep(.ant-table-tbody .ant-table-cell span[data-category="Đi lại"]) {
+  background: #f857a6 !important;
+}
+:deep(.ant-table-tbody .ant-table-cell span[data-category="Khác"]) {
+  background: #a18cd1 !important;
+}
+:deep(.ant-table-tbody .ant-table-cell span[data-category="Tích lũy"]) {
+  background: #43cea2 !important;
+}
+:deep(.ant-table-tbody .ant-table-cell span[data-category="Cho vay"]) {
+  background: #fa709a !important;
+}
+:deep(.ant-table-tbody .ant-table-cell span[data-category="Nợ"]) {
+  background: #224168 !important;
+}
+:deep(.ant-table-tbody .ant-table-cell span[data-category="Tiền nhà"]) {
+  background: #f9d423 !important;
+}
+:deep(.ant-table-tbody .ant-table-cell span[data-category="Học tập"]) {
+  background: #30cfd0 !important;
+}
+:deep(.ant-table-tbody .ant-table-cell span[data-category="Điện thoại"]) {
+  background: #f5576c !important;
+}
+:deep(.ant-table-tbody .ant-table-cell span[data-category="Sức khỏe"]) {
+  background: #6a82fb !important;
+}
+:deep(.ant-table-tbody .ant-table-cell span[data-category="Thú cưng"]) {
+  background: #fbc2eb !important;
+}
+:deep(.ant-table-tbody .ant-table-cell span[data-category="Cưới xin / Giỗ chạp"]) {
+  background: #fdc830 !important;
+}
+:deep(.ant-table-tbody .ant-table-cell span[data-category="Du lịch"]) {
+  background: #43c6ac !important;
+}
+:deep(.ant-tabs-tab) {
+  color: #ffffff !important;
+}
+:deep(.ant-tabs-tab-active) {
+  color: #1890ff !important;
 }
 </style> 

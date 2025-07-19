@@ -225,9 +225,9 @@ export const useExpensesInit = async () => {
 export const setupExpensesWatchers = () => {
   watch([selectedUserId, filterMonth], () => {
     if (selectedUserId.value) {
-      fetchExpenses();
-      fetchIncome();
-      fetchRealExpenses();
+    fetchExpenses();
+    fetchIncome();
+    fetchRealExpenses();
     }
   });
 };
