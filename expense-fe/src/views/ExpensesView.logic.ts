@@ -214,17 +214,12 @@ export const fetchRealExpenses = async () => {
 };
 
 export const useExpensesInit = async () => {
+  console.log('useExpensesInit called');
   await fetchUsers();
+  console.log('After fetchUsers, selectedUserId:', selectedUserId.value);
   await fetchCategories();
   await fetchStatuses();
-  await fetchIncome();
-  // Gọi fetchExpenses và fetchRealExpenses sau khi đã có selectedUserId
-  if (selectedUserId.value) {
-    await fetchExpenses();
-    await fetchRealExpenses();
-  } else {
-    console.log('selectedUserId is not set, skipping fetchExpenses');
-  }
+  // KHÔNG gọi fetchIncome ở đây nữa!
 };
 
 export const setupExpensesWatchers = () => {

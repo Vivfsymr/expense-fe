@@ -132,35 +132,25 @@ import {
   dialogVisibleIncome, editIncomeId, incomeForm, openAddIncome, openEditIncome, onSubmitIncome, onDeleteIncome, realExpenses, resetExpensesState
 } from './ExpensesView.logic';
 import $style from './ExpensesView.module.css';
-import { ref, watch, onMounted, computed } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { useAuthStore } from '../stores/auth';
 
 const activeTab = ref('expenses');
 const auth = useAuthStore();
 
-// Computed để force re-render khi user thay đổi
-const currentUserId = computed(() => auth.user?.id);
+// Chỉ gọi setupExpensesWatchers 1 lần duy nhất
+setupExpensesWatchers();
 
 onMounted(async () => {
-  // Reset state khi component được mount để đảm bảo dữ liệu mới
   resetExpensesState();
-  await useExpensesInit();
-  setupExpensesWatchers();
-});
-
-// Thêm watcher để theo dõi thay đổi của auth.user
-watch(() => auth.user, async (newUser, oldUser) => {
-  if (newUser && newUser !== oldUser) {
-    console.log('Auth user changed, reloading data');
-    resetExpensesState();
+  if (auth.user) {
     await useExpensesInit();
   }
-}, { immediate: true });
+});
 
-// Thêm watcher cho currentUserId
-watch(currentUserId, async (newId, oldId) => {
-  if (newId && newId !== oldId) {
-    console.log('Current user ID changed:', newId);
+// Watcher để theo dõi thay đổi của auth.user, chỉ fetch khi user đổi
+watch(() => auth.user, async (newUser, oldUser) => {
+  if (newUser && newUser !== oldUser) {
     resetExpensesState();
     await useExpensesInit();
   }
