@@ -48,7 +48,14 @@
                 </template>
                 <template v-else-if="column.key === 'actions'">
                   <a-button size="small" @click="openEdit(record)" style="margin-right: 8px;">Sửa</a-button>
-                  <a-button size="small" danger @click="onDelete(record.id)">Xoá</a-button>
+                  <a-popconfirm
+                    title="Bạn có chắc chắn muốn xóa chi tiêu này?"
+                    ok-text="Có"
+                    cancel-text="Không"
+                    @confirm="onDelete(record.id)"
+                  >
+                    <a-button size="small" danger>Xoá</a-button>
+                  </a-popconfirm>
                 </template>
               </template>
             </a-table>
@@ -102,7 +109,14 @@
               </template>
               <template v-else-if="column.key === 'actions'">
                 <a-button size="small" @click="openEditIncome(record)" style="margin-right: 8px;">Sửa</a-button>
-                <a-button size="small" danger @click="onDeleteIncome(record.id)">Xoá</a-button>
+                <a-popconfirm
+                  title="Bạn có chắc chắn muốn xóa thu nhập này?"
+                  ok-text="Có"
+                  cancel-text="Không"
+                  @confirm="onDeleteIncome(record.id)"
+                >
+                  <a-button size="small" danger>Xoá</a-button>
+                </a-popconfirm>
               </template>
             </template>
           </a-table>
