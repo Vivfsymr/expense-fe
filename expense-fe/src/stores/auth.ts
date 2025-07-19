@@ -36,6 +36,10 @@ export const useAuthStore = defineStore('auth', {
       this.user = null;
       localStorage.removeItem('user');
     },
+    clearUserData() {
+      this.user = null;
+      localStorage.removeItem('user');
+    },
   },
   
 }); 

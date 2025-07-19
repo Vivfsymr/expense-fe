@@ -127,15 +127,43 @@
 
 <script setup lang="ts">
 import {
-  expenses, users, categories, statuses, selectedUserId, filterMonth, filterCategory, filterStatus, dialogVisible, editId, form, loading, columns, incomeColumns, filteredExpenses, getCategoryName, getStatusName, openAdd, openEdit, onSubmit, onDelete, useExpensesInit, totalAmount, formatCurrency, parseCurrency,
+  expenses, users, categories, statuses, selectedUserId, filterMonth, filterCategory, filterStatus, dialogVisible, editId, form, loading, columns, incomeColumns, filteredExpenses, getCategoryName, getStatusName, openAdd, openEdit, onSubmit, onDelete, useExpensesInit, setupExpensesWatchers, totalAmount, formatCurrency, parseCurrency,
   income, selectedIncomeUserId, fetchIncome, filteredIncome, totalIncomeAmount,
-  dialogVisibleIncome, editIncomeId, incomeForm, openAddIncome, openEditIncome, onSubmitIncome, onDeleteIncome, realExpenses
+  dialogVisibleIncome, editIncomeId, incomeForm, openAddIncome, openEditIncome, onSubmitIncome, onDeleteIncome, realExpenses, resetExpensesState
 } from './ExpensesView.logic';
 import $style from './ExpensesView.module.css';
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted, computed } from 'vue';
+import { useAuthStore } from '../stores/auth';
 
 const activeTab = ref('expenses');
+const auth = useAuthStore();
 
-useExpensesInit();
+// Computed để force re-render khi user thay đổi
+const currentUserId = computed(() => auth.user?.id);
+
+onMounted(async () => {
+  // Reset state khi component được mount để đảm bảo dữ liệu mới
+  resetExpensesState();
+  await useExpensesInit();
+  setupExpensesWatchers();
+});
+
+// Thêm watcher để theo dõi thay đổi của auth.user
+watch(() => auth.user, async (newUser, oldUser) => {
+  if (newUser && newUser !== oldUser) {
+    console.log('Auth user changed, reloading data');
+    resetExpensesState();
+    await useExpensesInit();
+  }
+}, { immediate: true });
+
+// Thêm watcher cho currentUserId
+watch(currentUserId, async (newId, oldId) => {
+  if (newId && newId !== oldId) {
+    console.log('Current user ID changed:', newId);
+    resetExpensesState();
+    await useExpensesInit();
+  }
+});
 
 </script> 

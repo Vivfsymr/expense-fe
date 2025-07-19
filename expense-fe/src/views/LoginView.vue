@@ -19,7 +19,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
@@ -36,7 +36,7 @@ const onLogin = async () => {
   try {
     await auth.login(form.value.username, form.value.password);
     router.push('/expenses');
-  } catch (e: any) {
+  } catch (e) {
     error.value = e.message || 'Đăng nhập thất bại';
   } finally {
     loading.value = false;

@@ -31,6 +31,45 @@ export const income = ref([]);
 export const selectedIncomeUserId = ref('');
 export const realExpenses = ref(0);
 
+export const resetExpensesState = () => {
+  expenses.value = [];
+  users.value = [];
+  categories.value = [];
+  statuses.value = [];
+  selectedUserId.value = '';
+  filterCategory.value = '';
+  filterStatus.value = '';
+  dialogVisible.value = false;
+  editId.value = null;
+  form.value = {
+    title: '',
+    amount: 0,
+    category: '',
+    status: '',
+    description: '',
+    date: dayjs(),
+    userId: '',
+    forUserId: '',
+  };
+  loading.value = false;
+  income.value = [];
+  selectedIncomeUserId.value = '';
+  realExpenses.value = 0;
+  dialogVisibleIncome.value = false;
+  editIncomeId.value = null;
+  incomeForm.value = {
+    id: '',
+    title: '',
+    amount: 0,
+    category: '',
+    status: '',
+    description: '',
+    date: dayjs(),
+    userId: '',
+    forUserId: '',
+  };
+};
+
 export const dialogVisibleIncome = ref(false);
 export const editIncomeId = ref<string | null>(null);
 export const incomeForm = ref({
@@ -174,17 +213,27 @@ export const fetchRealExpenses = async () => {
   }
 };
 
-export const useExpensesInit = () => {
-  onMounted(() => {
-    fetchUsers();
-    fetchCategories();
-    fetchStatuses();
-    fetchIncome();
-  });
+export const useExpensesInit = async () => {
+  await fetchUsers();
+  await fetchCategories();
+  await fetchStatuses();
+  await fetchIncome();
+  // Gọi fetchExpenses và fetchRealExpenses sau khi đã có selectedUserId
+  if (selectedUserId.value) {
+    await fetchExpenses();
+    await fetchRealExpenses();
+  } else {
+    console.log('selectedUserId is not set, skipping fetchExpenses');
+  }
+};
+
+export const setupExpensesWatchers = () => {
   watch([selectedUserId, filterMonth], () => {
-    fetchExpenses();
-    fetchIncome();
-    fetchRealExpenses();
+    if (selectedUserId.value) {
+      fetchExpenses();
+      fetchIncome();
+      fetchRealExpenses();
+    }
   });
 };
 
