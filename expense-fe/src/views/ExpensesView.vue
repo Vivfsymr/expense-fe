@@ -18,35 +18,39 @@
     <a-tabs v-model:activeKey="activeTab">
       <a-tab-pane key="expenses" tab="Chi tiêu">
         <a-card>
-          <div style="margin-bottom: 12px; display: flex; justify-content: space-between; align-ite∆ms: center;">
-            <div style="gap: 12px; display: flex; justify-content: space-between; align-items: center;">
-              <a-select v-model:value="filterCategory" style="width: 160px;" placeholder="Lọc danh mục">
-                <a-select-option value="">Tất cả danh mục</a-select-option>
-                <a-select-option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name }}</a-select-option>
-              </a-select>
-              <a-select v-model:value="filterStatus" style="width: 160px;" placeholder="Lọc trạng thái">
-                <a-select-option value="">Tất cả trạng thái</a-select-option>
-                <a-select-option v-for="s in statuses" :key="s.id" :value="s.id">{{ s.name }}</a-select-option>
-              </a-select>
+          <div class="sticky-toolbar">
+            <div style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+              <div style="gap: 12px; display: flex; justify-content: space-between; align-items: center;">
+                <a-select v-model:value="filterCategory" style="width: 160px;" placeholder="Lọc danh mục">
+                  <a-select-option value="">Tất cả danh mục</a-select-option>
+                  <a-select-option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name }}</a-select-option>
+                </a-select>
+                <a-select v-model:value="filterStatus" style="width: 160px;" placeholder="Lọc trạng thái">
+                  <a-select-option value="">Tất cả trạng thái</a-select-option>
+                  <a-select-option v-for="s in statuses" :key="s.id" :value="s.id">{{ s.name }}</a-select-option>
+                </a-select>
+              </div>
+              <a-button type="primary" @click="openAdd">Thêm chi tiêu</a-button>
             </div>
-            <a-button type="primary" @click="openAdd">Thêm chi tiêu</a-button>
+            <div>Tổng số tiền: {{ totalAmount.toLocaleString() }} đ</div>
           </div>
-          <div>Tổng số tiền: {{ totalAmount.toLocaleString() }} đ</div>
-          <a-table :dataSource="filteredExpenses" :columns="columns" :loading="loading" rowKey="id" :pagination="{ pageSize: 10 }" :class="$style.table">
-            <template #bodyCell="{ column, record }">
-              <template v-if="column.key === 'category'">
-                {{ getCategoryName(record.category) }}
+          <div class="scroll-table">
+            <a-table :dataSource="filteredExpenses" :columns="columns" :loading="loading" rowKey="id" :pagination="false" :class="$style.table">
+              <template #bodyCell="{ column, record }">
+                <template v-if="column.key === 'category'">
+                  {{ getCategoryName(record.category) }}
+                </template>
+                <template v-else-if="column.key === 'status'">
+                  {{ getStatusName(record.status) }}
+                </template>
+                <template v-else-if="column.key === 'actions'">
+                  <a-button size="small" @click="openEdit(record)" style="margin-right: 8px;">Sửa</a-button>
+                  <a-button size="small" danger @click="onDelete(record.id)">Xoá</a-button>
+                </template>
               </template>
-              <template v-else-if="column.key === 'status'">
-                {{ getStatusName(record.status) }}
-              </template>
-              <template v-else-if="column.key === 'actions'">
-                <a-button size="small" @click="openEdit(record)" style="margin-right: 8px;">Sửa</a-button>
-                <a-button size="small" danger @click="onDelete(record.id)">Xoá</a-button>
-              </template>
-            </template>
-          </a-table>
-          <a-empty v-if="!filteredExpenses.length && !loading" description="Không có chi tiêu trong tháng này" :class="$style.empty" />
+            </a-table>
+            <a-empty v-if="!filteredExpenses.length && !loading" description="Không có chi tiêu trong tháng này" :class="$style.empty" />
+          </div>
         </a-card>
         <a-modal v-model:open="dialogVisible" :title="editId ? 'Sửa chi tiêu' : 'Thêm chi tiêu'" @ok="onSubmit" @cancel="() => dialogVisible = false" :confirm-loading="loading" :ok-button-props="{ disabled: loading }">
           <a-form :model="form" layout="vertical">
@@ -85,7 +89,7 @@
             <div>Tổng thu nhập: {{ totalIncomeAmount.toLocaleString() }} đ</div>
             <a-button type="primary" @click="openAddIncome">Thêm thu nhập</a-button>
           </div>
-          <a-table :dataSource="filteredIncome" :columns="incomeColumns" :loading="loading" rowKey="id" :pagination="{ pageSize: 10 }" :class="$style.table">
+          <a-table :dataSource="filteredIncome" :columns="incomeColumns" :loading="loading" rowKey="id" :pagination="false" :class="$style.table">
             <template #bodyCell="{ column, record }">
               <template v-if="column.key === 'category'">
                 {{ getCategoryName(record.category) }}
@@ -157,3 +161,18 @@ watch(() => auth.user, async (newUser, oldUser) => {
 });
 
 </script> 
+
+<style scoped>
+.sticky-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #18191a;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+.scroll-table {
+  max-height: 630px;
+  overflow-y: auto;
+}
+</style> 
