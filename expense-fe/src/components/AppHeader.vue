@@ -46,7 +46,7 @@ const logout = () => {
 
 <style scoped>
 .app-header {
-  background: #fff;
+  background: #27ae60;
   display: flex;
   align-items: center;
   justify-content: space-between;
