@@ -21,11 +21,12 @@
 import { useAuthStore } from '../stores/auth';
 import { useRouter, useRoute } from 'vue-router';
 import { ref, computed } from 'vue';
+import { storeToRefs } from 'pinia';
 
 const auth = useAuthStore();
+const { user } = storeToRefs(auth);
 const router = useRouter();
 const route = useRoute();
-const user = auth.user;
 
 const selectedKey = computed(() => {
   if (route.path.startsWith('/expenses')) return 'expenses';
