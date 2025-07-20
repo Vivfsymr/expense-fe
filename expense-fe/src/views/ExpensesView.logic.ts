@@ -410,4 +410,44 @@ export const formatCurrency = (value: any) => {
     if (!value) return '';
     return value.replace(/[^\d]/g, '');
   };
+
+export const exportExpensesExcel = async () => {
+  if (!selectedUserId.value || !filterMonth.value) return;
+  
+  try {
+    const month = filterMonth.value.month() + 1;
+    const year = filterMonth.value.year();
+    const url = `${API_BASE_URL}/expenses/export-excel/${selectedUserId.value}?month=${month}&year=${year}`;
+    
+    // Tạo link tạm thời để download
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `chi-tieu-thang-${month}-${year}.xlsx`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } catch (error) {
+    console.error('Lỗi khi export Excel chi tiêu:', error);
+  }
+};
+
+export const exportIncomeExcel = async () => {
+  if (!selectedUserId.value || !filterMonth.value) return;
+  
+  try {
+    const month = filterMonth.value.month() + 1;
+    const year = filterMonth.value.year();
+    const url = `${API_BASE_URL}/incomes/export-excel/${selectedUserId.value}?month=${month}&year=${year}`;
+    
+    // Tạo link tạm thời để download
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `thu-nhap-thang-${month}-${year}.xlsx`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } catch (error) {
+    console.error('Lỗi khi export Excel thu nhập:', error);
+  }
+};
   
