@@ -369,7 +369,8 @@ export const filteredExpenses = computed(() => {
   if (filterStatus.value) {
     data = data.filter((e: any) => e.status === filterStatus.value);
   }
-  return data;
+  // Sort theo ngày giảm dần để các bản ghi cùng ngày luôn liền nhau
+  return data.slice().sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
 });
 
 export const totalAmount = computed(() => {
