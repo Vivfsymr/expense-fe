@@ -36,7 +36,14 @@
             <div style="color: #00831c;">Tổng số tiền: {{ totalAmount.toLocaleString() }} đ</div>
           </div>
           <div class="scroll-table">
-            <a-table :dataSource="filteredExpenses" :columns="columns" :loading="loading" rowKey="id" :pagination="false" :class="$style.table">
+            <a-table
+              :dataSource="filteredExpenses"
+              :columns="columnsWithRowSpan"
+              :loading="loading"
+              rowKey="id"
+              :pagination="false"
+              :class="$style.table"
+            >
               <template #bodyCell="{ column, record }">
                 <template v-if="column.key === 'category'">
                   <span
@@ -160,7 +167,8 @@ import {
   exportExpensesExcel, exportIncomeExcel
 } from './ExpensesView.logic';
 import $style from './ExpensesView.module.css';
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, onMounted, computed } from 'vue';
+import dayjs from 'dayjs';
 import { useAuthStore } from '../stores/auth';
 
 const activeTab = ref('expenses');
@@ -168,6 +176,33 @@ const auth = useAuthStore();
 
 // Chỉ gọi setupExpensesWatchers 1 lần duy nhất
 setupExpensesWatchers();
+
+const columnsWithRowSpan = computed(() => {
+  return columns.map(col => {
+    if (col.key === 'date') {
+      return {
+        ...col,
+        customRender({ text, record, index }) {
+          const currentDate = dayjs(record.date).format('YYYY-MM-DD');
+          const all = filteredExpenses.value;
+          const firstIndex = all.findIndex(e => dayjs(e.date).format('YYYY-MM-DD') === currentDate);
+          const rowSpan = all.filter(e => dayjs(e.date).format('YYYY-MM-DD') === currentDate).length;
+          if (index === firstIndex) {
+            return {
+              children: dayjs(text).format('YYYY-MM-DD'),
+              props: { rowSpan }
+            };
+          }
+          return {
+            children: '',
+            props: { rowSpan: 0 }
+          };
+        }
+      };
+    }
+    return col;
+  });
+});
 
 onMounted(async () => {
   resetExpensesState();
