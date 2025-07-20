@@ -28,7 +28,10 @@
                   <a-select-option v-for="s in statuses" :key="s.id" :value="s.id">{{ s.name }}</a-select-option>
                 </a-select>
               </div>
-              <a-button type="primary" @click="openAdd">Thêm chi tiêu</a-button>
+              <div style="display: flex; gap: 8px;">
+                <a-button type="primary" @click="openAdd">Thêm chi tiêu</a-button>
+                <a-button type="default" @click="exportExpensesExcel">Export Excel</a-button>
+              </div>
             </div>
             <div style="color: #00831c;">Tổng số tiền: {{ totalAmount.toLocaleString() }} đ</div>
           </div>
@@ -55,7 +58,14 @@
                 </template>
                 <template v-else-if="column.key === 'actions'">
                   <a-button size="small" @click="openEdit(record)" style="margin-right: 8px;">Sửa</a-button>
-                  <a-button size="small" danger @click="onDelete(record.id)">Xoá</a-button>
+                  <a-popconfirm
+                    title="Bạn có chắc chắn muốn xóa chi tiêu này?"
+                    ok-text="Có"
+                    cancel-text="Không"
+                    @confirm="onDelete(record.id)"
+                  >
+                    <a-button size="small" danger>Xoá</a-button>
+                  </a-popconfirm>
                 </template>
               </template>
             </a-table>
@@ -97,7 +107,10 @@
         <a-card>
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <div>Tổng thu nhập: {{ totalIncomeAmount.toLocaleString() }} đ</div>
-            <a-button type="primary" @click="openAddIncome">Thêm thu nhập</a-button>
+            <div style="display: flex; gap: 8px;">
+              <a-button type="primary" @click="openAddIncome">Thêm thu nhập</a-button>
+              <a-button type="default" @click="exportIncomeExcel">Export Excel</a-button>
+            </div>
           </div>
           <a-table :dataSource="filteredIncome" :columns="incomeColumns" :loading="loading" rowKey="id" :pagination="false" :class="$style.table">
             <template #bodyCell="{ column, record }">
@@ -109,7 +122,14 @@
               </template>
               <template v-else-if="column.key === 'actions'">
                 <a-button size="small" @click="openEditIncome(record)" style="margin-right: 8px;">Sửa</a-button>
-                <a-button size="small" danger @click="onDeleteIncome(record.id)">Xoá</a-button>
+                <a-popconfirm
+                  title="Bạn có chắc chắn muốn xóa thu nhập này?"
+                  ok-text="Có"
+                  cancel-text="Không"
+                  @confirm="onDeleteIncome(record.id)"
+                >
+                  <a-button size="small" danger>Xoá</a-button>
+                </a-popconfirm>
               </template>
             </template>
           </a-table>
@@ -143,7 +163,8 @@
 import {
   expenses, users, categories, statuses, selectedUserId, filterMonth, filterCategory, filterStatus, dialogVisible, editId, form, loading, columns, incomeColumns, filteredExpenses, getCategoryName, getStatusName, openAdd, openEdit, onSubmit, onDelete, useExpensesInit, setupExpensesWatchers, totalAmount, formatCurrency, parseCurrency,
   income, selectedIncomeUserId, fetchIncome, filteredIncome, totalIncomeAmount,
-  dialogVisibleIncome, editIncomeId, incomeForm, openAddIncome, openEditIncome, onSubmitIncome, onDeleteIncome, realExpenses, resetExpensesState
+  dialogVisibleIncome, editIncomeId, incomeForm, openAddIncome, openEditIncome, onSubmitIncome, onDeleteIncome, realExpenses, resetExpensesState,
+  exportExpensesExcel, exportIncomeExcel
 } from './ExpensesView.logic';
 import $style from './ExpensesView.module.css';
 import { ref, watch, onMounted, computed } from 'vue';
