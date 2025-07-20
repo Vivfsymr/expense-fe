@@ -28,7 +28,10 @@
                   <a-select-option v-for="s in statuses" :key="s.id" :value="s.id">{{ s.name }}</a-select-option>
                 </a-select>
               </div>
-              <a-button type="primary" @click="openAdd">Thêm chi tiêu</a-button>
+              <div style="display: flex; gap: 8px;">
+                <a-button type="primary" @click="openAdd">Thêm chi tiêu</a-button>
+                <a-button type="default" @click="exportExpensesExcel">Export Excel</a-button>
+              </div>
             </div>
             <div style="color: #00831c;">Tổng số tiền: {{ totalAmount.toLocaleString() }} đ</div>
           </div>
@@ -97,7 +100,10 @@
         <a-card>
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <div>Tổng thu nhập: {{ totalIncomeAmount.toLocaleString() }} đ</div>
-            <a-button type="primary" @click="openAddIncome">Thêm thu nhập</a-button>
+            <div style="display: flex; gap: 8px;">
+              <a-button type="primary" @click="openAddIncome">Thêm thu nhập</a-button>
+              <a-button type="default" @click="exportIncomeExcel">Export Excel</a-button>
+            </div>
           </div>
           <a-table :dataSource="filteredIncome" :columns="incomeColumns" :loading="loading" rowKey="id" :pagination="false" :class="$style.table">
             <template #bodyCell="{ column, record }">
@@ -150,7 +156,8 @@
 import {
   expenses, users, categories, statuses, selectedUserId, filterMonth, filterCategory, filterStatus, dialogVisible, editId, form, loading, columns, incomeColumns, filteredExpenses, getCategoryName, getStatusName, openAdd, openEdit, onSubmit, onDelete, useExpensesInit, setupExpensesWatchers, totalAmount, formatCurrency, parseCurrency,
   income, selectedIncomeUserId, fetchIncome, filteredIncome, totalIncomeAmount,
-  dialogVisibleIncome, editIncomeId, incomeForm, openAddIncome, openEditIncome, onSubmitIncome, onDeleteIncome, realExpenses, resetExpensesState
+  dialogVisibleIncome, editIncomeId, incomeForm, openAddIncome, openEditIncome, onSubmitIncome, onDeleteIncome, realExpenses, resetExpensesState,
+  exportExpensesExcel, exportIncomeExcel
 } from './ExpensesView.logic';
 import $style from './ExpensesView.module.css';
 import { ref, watch, onMounted } from 'vue';
