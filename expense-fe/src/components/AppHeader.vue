@@ -48,17 +48,16 @@ const logout = () => {
 
 <style scoped>
 .app-header {
-  background: #27ae60;
+  background:rgb(3, 3, 3);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 64px;
+  height: 50px;
   padding: 0 32px;
-  box-shadow: 0 2px 8px 0 #f0f1f2;
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 100%;
   z-index: 10;
 }
 .header-left {
@@ -75,7 +74,6 @@ const logout = () => {
 .header-title {
   font-size: 20px;
   font-weight: 700;
-  color: #1677ff;
   letter-spacing: 1px;
 }
 .header-menu {
@@ -91,23 +89,24 @@ const logout = () => {
   gap: 4px;
 }
 .header-username {
-  color: #222;
+  color: #f1f1f1;
   font-weight: 500;
   margin-right: 8px;
 }
 .logout-btn {
   border-radius: 6px;
   background: #f0f1f2;
-  color: #1677ff;
+  color: #090a0b;
   font-weight: 500;
   border: none;
   transition: background 0.2s, color 0.2s;
 }
 .logout-btn:hover {
   background: #1677ff;
-  color: #fff;
+  color: #fafafa;
 }
-:deep(.ant-menu-item-selected) {
-  color: #fff !important;
+:deep(.ant-menu-item) {
+  color: #fafafa !important; /* Màu chữ mặc định */
+  background: transparent !important;
 }
 </style> 

@@ -1,7 +1,5 @@
 .wrapper {
   max-width: 1800px;
-  margin: 32px auto;
-  padding: 32px;
   gap: 40px;
 }
 .filterRow {
@@ -43,4 +41,3 @@
   flex: 1 1 0;
   min-width: 600px;
 } 
-
