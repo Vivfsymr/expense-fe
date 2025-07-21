@@ -26,7 +26,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import axios from 'axios';
+import api from '../services/api';
 
 const users = ref([]);
 const loading = ref(false);
@@ -45,12 +45,11 @@ const columns = [
 const fetchUsers = async () => {
   loading.value = true;
   try {
-    const res = await axios.get('/api/users');
+    const res = await api.get('/api/users');
     if (res.data && res.data.success) {
       users.value = res.data.data;
     } else {
       users.value = [];
-      // Có thể hiển thị thông báo lỗi ở đây nếu muốn
     }
   } finally {
     loading.value = false;
@@ -66,13 +65,13 @@ const openEdit = (row: any) => {
 
 const onSubmit = async () => {
   if (!editId.value) return;
-  await axios.put(`/api/users/${editId.value}`, form.value);
+  await api.put(`/api/users/${editId.value}`, form.value);
   dialogVisible.value = false;
   fetchUsers();
 };
 
 const onDelete = async (id: string) => {
-  await axios.delete(`/api/users/${id}`);
+  await api.delete(`/api/users/${id}`);
   fetchUsers();
 };
 

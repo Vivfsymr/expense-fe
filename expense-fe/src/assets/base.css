@@ -84,8 +84,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-:global(.ant-card-body) {
-  height: calc(100vh - 220px); /* 220px là tổng chiều cao header + filter, bạn có thể điều chỉnh */
-  overflow-y: auto;
-  overflow-x: hidden;
+body, html {
+  background: #f5f5f5 !important;
 }
+

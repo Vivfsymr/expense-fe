@@ -2,7 +2,7 @@
   <div :class="$style.wrapper">
     <a-spin :spinning="loading" :class="$style.dashboardSpin">
       <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px;">
-      <span style="font-size: 20px; font-weight: bold; color: #d4ff47;" > Năm</span>
+      <span style="font-size: 20px; font-weight: bold; color: #000000;" ></span>
       <a-select v-model:value="selectedYear" style="width: 120px;" @change="fetchDashboard">
         <a-select-option v-for="y in yearOptions" :key="y" :value="y">{{ y }}</a-select-option>
       </a-select>
@@ -26,7 +26,7 @@
       <a-table :dataSource="dashboard?.summaryMonths || []" :columns="monthColumns" rowKey="nameOfMonth" :pagination="false">
         <template #bodyCell="{ column, record }">
           <template v-if="column.key === 'actions'">
-            <a-button size="small" @click="openMonthDetail(record)">Chi tiết</a-button>
+            <a-button style="border-color: #ff1616;" size="small" @click="openMonthDetail(record)">Chi tiết</a-button>
           </template>
           <template v-else-if="column.key === 'totalMonthAmountExpense'">
             {{ record.totalMonthAmountExpense.toLocaleString() }} đ
@@ -55,7 +55,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
 import { useAuthStore } from '../stores/auth';
-import axios from 'axios';
+import api from '../services/api';
 import $style from './ExpensesView.module.css';
 import VChart from 'vue-echarts';
 import { use } from 'echarts/core';
@@ -97,7 +97,7 @@ const fetchDashboard = async () => {
   try {
     const url = `${API_BASE_URL}/DashBoard/${auth.user.id}?year=${selectedYear.value}`;
     console.log('API URL:', url);
-    const res = await axios.get(url);
+    const res = await api.get(url);
     console.log('Dashboard response:', res.data);
     dashboard.value = res.data;
   } catch (error) {
@@ -110,7 +110,7 @@ const fetchDashboard = async () => {
 function setDashboardLayoutContentPadding() {
   const layoutContent = document.querySelector('.dashboard-layout-content') as HTMLElement | null;
   if (layoutContent) {
-    layoutContent.style.padding = '400px 16px 16px 16px';
+    layoutContent.style.padding = '350px 16px 16px 16px';
     layoutContent.style.minHeight = 'calc(100vh - 80px)';
   }
 }

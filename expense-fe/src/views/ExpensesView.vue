@@ -1,7 +1,7 @@
 <template>
   <div :class="$style.wrapper">
     <div style="flex-direction: row; display: flex; justify-content: space-between; align-items: center;">
-      <div style="margin-bottom: 16px; font-size: 16px; font-weight: bold; color: #18ff8b;">
+      <div style="margin-bottom: 16px; font-size: 16px; font-weight: bold; color: #f54729;">
         Số tiền còn lại: {{ realExpenses.toLocaleString() }} đ
       </div>
       <div :class="$style.filterRow">
@@ -14,7 +14,10 @@
       </div>
       </div>
     <a-tabs v-model:activeKey="activeTab">
-      <a-tab-pane key="expenses" tab="Chi tiêu">
+      <a-tab-pane key="expenses">
+        <template #tab>
+          <span :style="{ color: activeTab === 'expenses' ? '#27ae60' : '#222' }">Chi tiêu</span>
+        </template>
         <a-card>
           <div class="sticky-toolbar">
             <div style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
@@ -102,8 +105,10 @@
           </a-form>
         </a-modal>
       </a-tab-pane>
-      <a-tab-pane key="income" tab="Thu nhập">
-       
+      <a-tab-pane key="income">
+        <template #tab>
+          <span :style="{ color: activeTab === 'income' ? '#1890ff' : '#222' }">Thu nhập</span>
+        </template>
         <a-card>
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <div style="color: #00831c;">Tổng thu nhập: {{ totalIncomeAmount.toLocaleString() }} đ</div>
@@ -237,6 +242,41 @@ watch(() => auth.user, async (newUser, oldUser) => {
 </script> 
 
 <style scoped>
+.wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 0; /* Chỉ padding trên/dưới, không padding trái/phải */
+  box-sizing: border-box;
+  min-height: 100vh;
+}
+
+:global(body), :global(html) {
+  overflow-x: hidden;
+}
+
+:deep(.ant-card) {
+  box-sizing: border-box;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+:deep(.ant-card-body) {
+  padding-left: 10 !important;
+  padding-right: 0 !important;
+}
+.scroll-table {
+  max-width: 100%;
+  width: 100%;
+  overflow-x: auto;
+  max-height: 690px;
+  
+}
+
+:deep(.ant-table) {
+  table-layout: fixed;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .sticky-toolbar {
   position: sticky;
   top: 0;
@@ -245,10 +285,7 @@ watch(() => auth.user, async (newUser, oldUser) => {
   padding-top: 8px;
   padding-bottom: 8px;
 }
-.scroll-table {
-  max-height: 630px;
-  overflow-y: auto;
-}
+
 :deep(.ant-table-thead > tr > th),
 :deep(.ant-table-tbody > tr > td) {
   padding-top: 2px !important;

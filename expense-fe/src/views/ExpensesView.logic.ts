@@ -1,6 +1,6 @@
 import { ref, onMounted, computed, watch } from 'vue';
 import { expenseService } from '../services/expenseService';
-import axios from 'axios';
+import api from '../services/api';
 import { useAuthStore } from '../stores/auth';
 import dayjs from 'dayjs';
 import { API_BASE_URL } from '../config';
@@ -107,7 +107,7 @@ export const incomeColumns = [
 export const fetchUsers = async () => {
   loading.value = true;
   try {
-    const res = await axios.get(`${API_BASE_URL}/users`);
+    const res = await api.get(`${API_BASE_URL}/users`);
     if (res.data && res.data.success) {
       users.value = res.data.data;
     } else {
@@ -129,7 +129,7 @@ export const fetchUsers = async () => {
 export const fetchCategories = async () => {
   loading.value = true;
   try {
-    const res = await axios.get(`${API_BASE_URL}/categories`);
+    const res = await api.get(`${API_BASE_URL}/categories`);
     if (res.data && res.data.success) {
       categories.value = res.data.data;
     } else {
@@ -143,7 +143,7 @@ export const fetchCategories = async () => {
 export const fetchStatuses = async () => {
   loading.value = true;
   try {
-    const res = await axios.get(`${API_BASE_URL}/statuses`);
+    const res = await api.get(`${API_BASE_URL}/statuses`);
     if (res.data && res.data.success) {
       statuses.value = res.data.data;
     } else {
@@ -160,7 +160,7 @@ export const fetchExpenses = async () => {
   try {
     const month = filterMonth.value.month() + 1;
     const year = filterMonth.value.year();
-    const res = await axios.get(
+    const res = await api.get(
       `${API_BASE_URL}/expenses/getByQuery/${selectedUserId.value}`,
       { params: { month, year } }
     );
@@ -180,7 +180,7 @@ export const fetchIncome = async () => {
   try {
     const month = filterMonth.value.month() + 1;
     const year = filterMonth.value.year();
-    const res = await axios.get(
+    const res = await api.get(
       `${API_BASE_URL}/incomes/getByQuery/${selectedUserId.value}`,
       { params: { month, year } }
     );
@@ -200,7 +200,7 @@ export const fetchRealExpenses = async () => {
   try {
     const month = filterMonth.value.month() + 1;
     const year = filterMonth.value.year();
-    const res = await axios.get(`${API_BASE_URL}/expenses/RealExpenses/${selectedUserId.value}`, {
+    const res = await api.get(`${API_BASE_URL}/expenses/RealExpenses/${selectedUserId.value}`, {
       params: { month, year }
     });
     if (res.data && res.data.success) {
@@ -331,9 +331,9 @@ export const onSubmitIncome = async () => {
       ...(editIncomeId.value && { id: editIncomeId.value }),
     };
     if (editIncomeId.value) {
-      await axios.put(`${API_BASE_URL}/incomes/${editIncomeId.value}`, data);
+      await api.put(`${API_BASE_URL}/incomes/${editIncomeId.value}`, data);
     } else {
-      await axios.post(`${API_BASE_URL}/incomes`, data);
+      await api.post(`${API_BASE_URL}/incomes`, data);
     }
     dialogVisibleIncome.value = false;
     await fetchIncome();
@@ -346,7 +346,7 @@ export const onSubmitIncome = async () => {
 export const onDeleteIncome = async (id: string) => {
   loading.value = true;
   try {
-    await axios.delete(`${API_BASE_URL}/incomes/${id}`);
+    await api.delete(`${API_BASE_URL}/incomes/${id}`);
     await fetchIncome();
     await fetchRealExpenses();
   } finally {
@@ -414,15 +414,14 @@ export const formatCurrency = (value: any) => {
 
 export const exportExpensesExcel = async () => {
   if (!selectedUserId.value || !filterMonth.value) return;
-  
   try {
     const month = filterMonth.value.month() + 1;
     const year = filterMonth.value.year();
-    const url = `${API_BASE_URL}/expenses/export-excel/${selectedUserId.value}?month=${month}&year=${year}`;
-    
-    // Tạo link tạm thời để download
+    const url = `/expenses/export-excel/${selectedUserId.value}?month=${month}&year=${year}`;
+    const res = await api.get(url, { responseType: 'blob' });
+    const blob = new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     const link = document.createElement('a');
-    link.href = url;
+    link.href = window.URL.createObjectURL(blob);
     link.download = `chi-tieu-thang-${month}-${year}.xlsx`;
     document.body.appendChild(link);
     link.click();
@@ -434,15 +433,14 @@ export const exportExpensesExcel = async () => {
 
 export const exportIncomeExcel = async () => {
   if (!selectedUserId.value || !filterMonth.value) return;
-  
   try {
     const month = filterMonth.value.month() + 1;
     const year = filterMonth.value.year();
-    const url = `${API_BASE_URL}/incomes/export-excel/${selectedUserId.value}?month=${month}&year=${year}`;
-    
-    // Tạo link tạm thời để download
+    const url = `/incomes/export-excel/${selectedUserId.value}?month=${month}&year=${year}`;
+    const res = await api.get(url, { responseType: 'blob' });
+    const blob = new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     const link = document.createElement('a');
-    link.href = url;
+    link.href = window.URL.createObjectURL(blob);
     link.download = `thu-nhap-thang-${month}-${year}.xlsx`;
     document.body.appendChild(link);
     link.click();

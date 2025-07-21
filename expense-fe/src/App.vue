@@ -1,5 +1,5 @@
 <template>
-  <a-layout style="min-height: 100vh; width: 100vw; background: #181a1b;">
+  <a-layout style="min-height: 100vh; width: 100vw; background: #f9f8f8;">
     <AppHeader />
     <a-layout-content
       :class="layoutContentClass"
