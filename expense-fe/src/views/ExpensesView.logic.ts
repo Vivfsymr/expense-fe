@@ -386,12 +386,6 @@ export const filteredIncome = computed(() => {
       return m === filterMonth.value.format('YYYY-MM');
     });
   }
-  if (filterCategory.value) {
-    data = data.filter((e: any) => e.category === filterCategory.value);
-  }
-  if (filterStatus.value) {
-    data = data.filter((e: any) => e.status === filterStatus.value);
-  }
   return data;
 });
 
