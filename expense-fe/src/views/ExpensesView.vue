@@ -183,9 +183,9 @@ const columnsWithRowSpan = computed(() => {
     if (col.key === 'date') {
       return {
         ...col,
-        customRender({ text, record, index }) {
+        customRender({ text, record, index }: { text: any; record: any; index: number }) {
           const currentDate = dayjs(record.date).format('YYYY-MM-DD');
-          const all = filteredExpenses.value;
+          const all = filteredExpenses.value as any[];
           const firstIndex = all.findIndex(e => dayjs(e.date).format('YYYY-MM-DD') === currentDate);
           const rowSpan = all.filter(e => dayjs(e.date).format('YYYY-MM-DD') === currentDate).length;
           if (index === firstIndex) {
