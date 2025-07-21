@@ -250,10 +250,6 @@ watch(() => auth.user, async (newUser, oldUser) => {
   min-height: 100vh;
 }
 
-:global(body), :global(html) {
-  overflow-x: hidden;
-}
-
 :deep(.ant-card) {
   box-sizing: border-box;
   padding-left: 8px;
