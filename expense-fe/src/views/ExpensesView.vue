@@ -106,7 +106,7 @@
        
         <a-card>
           <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div>Tổng thu nhập: {{ totalIncomeAmount.toLocaleString() }} đ</div>
+            <div style="color: #00831c;">Tổng thu nhập: {{ totalIncomeAmount.toLocaleString() }} đ</div>
             <div style="display: flex; gap: 8px;">
               <a-button type="primary" @click="openAddIncome">Thêm thu nhập</a-button>
               <a-button type="default" @click="exportIncomeExcel">Export Excel</a-button>
@@ -170,6 +170,7 @@ import $style from './ExpensesView.module.css';
 import { ref, watch, onMounted, computed } from 'vue';
 import dayjs from 'dayjs';
 import { useAuthStore } from '../stores/auth';
+import {  onBeforeUnmount } from 'vue';
 
 const activeTab = ref('expenses');
 const auth = useAuthStore();
@@ -208,7 +209,21 @@ onMounted(async () => {
   resetExpensesState();
   if (auth.user) {
     await useExpensesInit();
+    setDashboardLayoutContentPadding();
+  window.addEventListener('resize', setDashboardLayoutContentPadding);
   }
+});
+
+function setDashboardLayoutContentPadding() {
+  const layoutContent = document.querySelector('.expenses-layout-content') as HTMLElement | null;
+  if (layoutContent) {
+    layoutContent.style.padding = '60px 16px 16px 16px';
+    layoutContent.style.minHeight = 'calc(100vh - 80px)';
+  }
+}
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', setDashboardLayoutContentPadding);
 });
 
 // Watcher để theo dõi thay đổi của auth.user, chỉ fetch khi user đổi
