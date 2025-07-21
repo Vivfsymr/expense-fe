@@ -1,8 +1,7 @@
 <template>
   <div style="max-width: 600px; margin: 48px auto;">
     <a-card>
-      <h2>Chào mừng đến với Expense Manager!</h2>
-      <p>Đây là trang quản lý chi tiêu cá nhân và nhóm. Hãy chọn mục <b>Chi tiêu</b> ở menu để bắt đầu quản lý các khoản chi của bạn.</p>
+      <p>TỰ DẶN BẢN THÂN NHẤT ĐỊNH SAU NÀY PHẢI THÀNH CÔNG, ĐỂ CÓ MỘT CUỘC SỐNG ĐÚNG NGHĨA LÀ SỐNG VÀ HẠNH PHÚC</p>
       <a-button type="primary" @click="$router.push('/expenses')">Đến trang Chi tiêu</a-button>
     </a-card>
   </div>

@@ -3,6 +3,7 @@
     <div class="header-left">
     </div>
     <a-menu mode="horizontal" :selectedKeys="[selectedKey]" class="header-menu" @click="onMenuClick">
+      <a-menu-item key="homes">Trang chủ</a-menu-item>
       <a-menu-item key="expenses">Chi tiêu</a-menu-item>
       <a-menu-item key="dashboard">Dashboard</a-menu-item>
     </a-menu>
@@ -36,7 +37,7 @@ const selectedKey = computed(() => {
 
 const onMenuClick = (e: any) => {
   if (e.key === 'expenses') router.push('/expenses');
-  if (e.key === 'users') router.push('/users');
+  if (e.key === 'homes') router.push('/');
   if (e.key === 'dashboard') router.push('/dashboard');
 };
 
