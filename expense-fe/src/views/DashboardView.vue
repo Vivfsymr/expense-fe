@@ -41,8 +41,7 @@
       </a-table>
     </a-card>
     <a-modal v-model:open="monthDetailVisible" :title="'Chi tiết danh mục tháng ' + (selectedMonth?.nameOfMonth || '') + '/' + selectedYear" @cancel="monthDetailVisible = false" :footer="null">
-      <div style="display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px;">
-        <div v-for="category in selectedMonth?.eachSummaryMonthOfCategories || []" :key="category.nameOfCategory" 
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding-bottom: 8px;">        <div v-for="category in selectedMonth?.eachSummaryMonthOfCategories || []" :key="category.nameOfCategory" 
              style="background: #f5f5f5; padding: 8px 12px; border-radius: 6px; min-width: 120px; text-align: center; flex-shrink: 0;">
           <div style="font-size: 12px; color: #666; margin-bottom: 4px;">{{ category.nameOfCategory }}</div>
           <div style="font-size: 14px; font-weight: bold; color: #f5222d;">{{ category.totalCategoryAmountExpense.toLocaleString() }} đ</div>

@@ -107,4 +107,7 @@ const logout = () => {
   background: #1677ff;
   color: #fff;
 }
+:deep(.ant-menu-item-selected) {
+  color: #fff !important;
+}
 </style> 
