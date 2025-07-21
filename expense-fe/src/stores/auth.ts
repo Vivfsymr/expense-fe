@@ -24,7 +24,7 @@ export const useAuthStore = defineStore('auth', {
         delete user.userId;
         this.user = user;
         localStorage.setItem('user', JSON.stringify(this.user));
-      } else {x
+      } else {
         throw new Error(res.data.message || 'Đăng nhập thất bại');
       }
     },
