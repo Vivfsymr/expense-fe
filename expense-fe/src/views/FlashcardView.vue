@@ -78,26 +78,6 @@
           Trước
         </a-button>
         
-        <div class="speech-settings">
-          <a-select 
-            v-model:value="speechLang" 
-            style="width: 120px; margin-right: 8px;"
-            size="small"
-            disabled
-            title="Tự động phát hiện ngôn ngữ"
-          >
-            <a-select-option value="auto">� Tự động</a-select-option>
-          </a-select>
-          <a-slider 
-            v-model:value="speechRate" 
-            :min="0.5" 
-            :max="2" 
-            :step="0.1"
-            style="width: 80px; margin-right: 8px;"
-            :tooltip-formatter="(value: number) => `${value}x`"
-          />
-        </div>
-        
         <a-button @click="loadMoreWords" v-if="hasMore" type="default" ghost>
           Tải thêm
         </a-button>
@@ -132,8 +112,6 @@ const hasMore = ref(true);
 
 // Speech synthesis
 const isSpeaking = ref(false);
-const speechLang = ref('auto');
-const speechRate = ref(1);
 const currentUtterance = ref<SpeechSynthesisUtterance | null>(null);
 
 // Touch handling for swipe
@@ -240,7 +218,7 @@ const speakText = () => {
   // Create utterance for English
   const utterance = new SpeechSynthesisUtterance(wordToSpeak);
   utterance.lang = 'en-US';
-  utterance.rate = speechRate.value;
+  utterance.rate = 1;
   utterance.volume = 1;
   
   utterance.onstart = () => {
@@ -345,14 +323,22 @@ onMounted(() => {
 </script>
 
 <style scoped>
+* {
+  box-sizing: border-box;
+}
+
 .flashcard-container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 0;
+  margin: 0;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-sizing: border-box;
+  width: 100vw;
+  overflow-x: hidden;
 }
 
 .loading {
@@ -367,6 +353,8 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   gap: 20px;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 .controls-top {
@@ -397,7 +385,7 @@ onMounted(() => {
 
 .flashcard {
   width: 100%;
-  height: 750px;
+  height: 800px;
   perspective: 1000px;
   user-select: none;
 }
@@ -418,7 +406,8 @@ onMounted(() => {
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  background: white;
+  background: #1a1a1a;
+  color: #ffffff;
   overflow-y: auto;
   position: relative;
 }
@@ -458,6 +447,7 @@ onMounted(() => {
   line-height: 1.6;
   text-align: left;
   width: 100%;
+  color: #ffffff;
 }
 
 .word-content :deep(.check-mark) {
@@ -466,22 +456,23 @@ onMounted(() => {
 }
 
 .word-content :deep(.arrow) {
-  color: #1890ff;
+  color: #40a9ff;
   font-weight: bold;
   margin: 0 5px;
 }
 
 .word-content :deep(.pronunciation) {
-  color: #722ed1;
+  color: #b37feb;
   font-weight: bold;
 }
 
 .word-content :deep(.word-type) {
-  background: #f0f0f0;
+  background: #2a2a2a;
   padding: 2px 6px;
   border-radius: 4px;
   font-weight: bold;
-  color: #666;
+  color: #d9d9d9;
+  border: 1px solid #404040;
 }
 
 .word-details {
@@ -497,16 +488,6 @@ onMounted(() => {
   justify-content: center;
 }
 
-.speech-settings {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 8px 12px;
-  border-radius: 8px;
-  backdrop-filter: blur(10px);
-}
-
 .swipe-hint {
   color: white;
   font-size: 14px;
@@ -519,16 +500,23 @@ onMounted(() => {
 }
 
 .no-data {
-  background: white;
+  background: #1a1a1a;
+  color: #ffffff;
   padding: 40px;
   border-radius: 15px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 /* Mobile responsive */
 @media (max-width: 768px) {
   .flashcard-container {
+    padding: 0;
+    margin: 0;
+  }
+  
+  .flashcard-wrapper {
     padding: 10px;
+    max-width: 100%;
   }
   
   .flashcard {
@@ -570,13 +558,6 @@ onMounted(() => {
   .speech-controls .ant-btn {
     width: 35px !important;
     height: 35px !important;
-  }
-  
-  .speech-settings {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 5px;
-    padding: 5px 8px;
   }
   
   .controls {
