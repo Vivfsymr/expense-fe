@@ -3,9 +3,7 @@
     <div class="header-left">
     </div>
     <a-menu mode="horizontal" :selectedKeys="[selectedKey]" class="header-menu" @click="onMenuClick">
-      <a-menu-item key="homes">Trang chủ</a-menu-item>
-      <a-menu-item key="expenses">Chi tiêu</a-menu-item>
-      <a-menu-item key="dashboard">Dashboard</a-menu-item>
+      <a-menu-item key="flashcard">Flashcard</a-menu-item>
     </a-menu>
     <div class="header-user" v-if="user">
       <a-avatar :size="32" style="margin-right: 8px; background: #1677ff;">
@@ -29,16 +27,12 @@ const router = useRouter();
 const route = useRoute();
 
 const selectedKey = computed(() => {
-  if (route.path.startsWith('/expenses')) return 'expenses';
-  if (route.path.startsWith('/users')) return 'users';
-  if (route.path.startsWith('/dashboard')) return 'dashboard';
+  if (route.path.startsWith('/flashcard')) return 'flashcard';
   return '';
 });
 
 const onMenuClick = (e: any) => {
-  if (e.key === 'expenses') router.push('/expenses');
-  if (e.key === 'homes') router.push('/');
-  if (e.key === 'dashboard') router.push('/dashboard');
+  if (e.key === 'flashcard') router.push('/flashcard');
 };
 
 const logout = () => {
