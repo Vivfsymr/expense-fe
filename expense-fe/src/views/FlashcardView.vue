@@ -289,7 +289,10 @@ const formatDate = (dateString: string) => {
 const formatWordContent = (content: string) => {
   // Format the word content with better styling
   return content
-    .replace(/\n/g, '<br>')
+    .replace(/\\n/g, '<br>') // Handle escaped newlines from API
+    .replace(/\n/g, '<br>') // Handle actual newlines
+    .replace(/\r\n/g, '<br>') // Handle Windows line endings
+    .replace(/\r/g, '<br>') // Handle Mac line endings
     .replace(/✅/g, '<span class="check-mark">✅</span>')
     .replace(/→/g, '<span class="arrow">→</span>')
     .replace(/(\w+\s*\/[^\/]+\/)/g, '<span class="pronunciation">$1</span>')
