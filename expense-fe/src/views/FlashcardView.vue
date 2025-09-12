@@ -94,7 +94,7 @@
             :max="2" 
             :step="0.1"
             style="width: 80px; margin-right: 8px;"
-            :tooltip-formatter="(value) => `${value}x`"
+            :tooltip-formatter="(value: number) => `${value}x`"
           />
         </div>
         
