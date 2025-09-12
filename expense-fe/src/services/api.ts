@@ -6,16 +6,12 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-    console.log('userStr1');
-
-  // Không thêm token cho login/register
   if (
     !config.url?.includes('/users/login') &&
     !config.url?.includes('/users/register')
   ) {
 
     const userStr = localStorage.getItem('user');
-    console.log('userStr', userStr);
     let token = '';
     if (userStr) {
       try {

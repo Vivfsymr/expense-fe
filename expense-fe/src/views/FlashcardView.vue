@@ -42,49 +42,22 @@
         <div class="card-inner">
           <div class="card-front">
             <div class="word-content" v-html="formatWordContent(currentWord.body)"></div>
-            <div class="speech-controls">
-              <a-button 
-                @click="speakText" 
-                :loading="isSpeaking" 
-                type="primary" 
-                shape="circle"
-                size="large"
-                class="speak-btn"
-                :title="isSpeaking ? 'Đang đọc...' : 'Đọc từ tiếng Anh đầu tiên'"
-              >
-                <template #icon>
-                  <span v-if="!isSpeaking">🔊</span>
-                  <span v-else>⏸️</span>
-                </template>
-              </a-button>
-              <a-button 
-                @click="stopSpeaking" 
-                v-if="isSpeaking"
-                type="default" 
-                shape="circle"
-                class="stop-btn"
-                title="Dừng đọc"
-              >
-                <template #icon>⏹️</template>
-              </a-button>
-            </div>
+            <a-button 
+              type="primary" 
+              shape="circle" 
+              size="large" 
+              class="speak-button" 
+              @click="speakWord"
+            >
+              🔊
+            </a-button>
           </div>
         </div>
       </div>
       
       <div class="controls">
-        <a-button @click="previousCard" :disabled="currentIndex === 0" type="primary" ghost>
-          <template #icon><LeftOutlined /></template>
-          Trước
-        </a-button>
-        
         <a-button @click="loadMoreWords" v-if="hasMore" type="default" ghost>
           Tải thêm
-        </a-button>
-        
-        <a-button @click="nextCard" :disabled="currentIndex === words.length - 1" type="primary">
-          Tiếp
-          <template #icon><RightOutlined /></template>
         </a-button>
       </div>
     </div>
@@ -98,7 +71,6 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { wordService, type Word, type WordQueryParams } from '../services/wordService';
-import { LeftOutlined, RightOutlined } from '@ant-design/icons-vue';
 import dayjs from 'dayjs';
 
 const words = ref<Word[]>([]);
@@ -110,10 +82,6 @@ const currentOffset = ref(0);
 const limit = ref(50);
 const hasMore = ref(true);
 
-// Speech synthesis
-const isSpeaking = ref(false);
-const currentUtterance = ref<SpeechSynthesisUtterance | null>(null);
-
 // Touch handling for swipe
 const touchStartX = ref(0);
 const touchEndX = ref(0);
@@ -121,6 +89,21 @@ const touchStartY = ref(0);
 const touchEndY = ref(0);
 
 const currentWord = computed(() => words.value[currentIndex.value]);
+
+// 🟢 Hàm đọc từ tiếng Anh đầu tiên
+const speakWord = () => {
+  if (!currentWord.value || !currentWord.value.body) return;
+
+  // Regex lấy từ tiếng Anh đầu tiên
+  const match = currentWord.value.body.match(/[a-zA-Z]+/);
+  if (!match) return;
+
+  const wordToSpeak = match[0];
+  const utterance = new SpeechSynthesisUtterance(wordToSpeak);
+  utterance.lang = 'en-US';
+  utterance.rate = 0.9; // tốc độ đọc (0.1 - 10)
+  speechSynthesis.speak(utterance);
+};
 
 const loadWords = async (reset: boolean = false) => {
   try {
@@ -168,82 +151,15 @@ const handleSortChange = async () => {
 };
 
 const nextCard = () => {
-  stopSpeaking(); // Dừng đọc khi chuyển thẻ
   if (currentIndex.value < words.value.length - 1) {
     currentIndex.value++;
   }
 };
 
 const previousCard = () => {
-  stopSpeaking(); // Dừng đọc khi chuyển thẻ
   if (currentIndex.value > 0) {
     currentIndex.value--;
   }
-};
-
-// Speech synthesis functions
-const speakText = () => {
-  if (!currentWord.value) return;
-  
-  // Check if browser supports speech synthesis
-  if (!('speechSynthesis' in window)) {
-    alert('Trình duyệt không hỗ trợ đọc text');
-    return;
-  }
-  
-  // Stop current speech if any
-  stopSpeaking();
-  
-  // Get clean text and extract first word
-  const cleanText = currentWord.value.body
-    .replace(/<[^>]*>/g, '') // Remove HTML tags
-    .replace(/✅/g, '') // Remove checkmarks
-    .replace(/→/g, '') // Remove arrows
-    .replace(/\s+/g, ' ') // Normalize whitespace
-    .trim();
-  
-  if (!cleanText) return;
-  
-  // Extract first English word only
-  const firstEnglishWord = cleanText.match(/\b[a-zA-Z]+\b/);
-  
-  if (!firstEnglishWord) {
-    console.log('No English word found');
-    return;
-  }
-  
-  const wordToSpeak = firstEnglishWord[0];
-  console.log('Speaking first English word:', wordToSpeak);
-  
-  // Create utterance for English
-  const utterance = new SpeechSynthesisUtterance(wordToSpeak);
-  utterance.lang = 'en-US';
-  utterance.rate = 1;
-  utterance.volume = 1;
-  
-  utterance.onstart = () => {
-    isSpeaking.value = true;
-  };
-  
-  utterance.onend = () => {
-    isSpeaking.value = false;
-  };
-  
-  utterance.onerror = (error) => {
-    console.error('Speech error:', error);
-    isSpeaking.value = false;
-  };
-  
-  currentUtterance.value = utterance;
-  speechSynthesis.speak(utterance);
-};
-
-const stopSpeaking = () => {
-  if (speechSynthesis.speaking) {
-    speechSynthesis.cancel();
-  }
-  isSpeaking.value = false;
-  currentUtterance.value = null;
 };
 
 const handleTouchStart = (e: TouchEvent) => {
@@ -304,15 +220,12 @@ onMounted(() => {
   
   // Add keyboard support
   const handleKeydown = (e: KeyboardEvent) => {
-    if (e.key === 'ArrowLeft') {
+    if (e.key === 'j' || e.key === 'J') {
+      // j = previous card (giống vim)
       previousCard();
-    } else if (e.key === 'ArrowRight') {
+    } else if (e.key === 'l' || e.key === 'L') {
+      // l = next card (giống vim)
       nextCard();
-    } else if (e.key === ' ' || e.key === 'Enter') {
-      e.preventDefault();
-      speakText();
-    } else if (e.key === 'Escape') {
-      stopSpeaking();
     }
   };
   
@@ -388,7 +301,7 @@ onMounted(() => {
 
 .flashcard {
   width: 100%;
-  height: 800px;
+  height: 850px;
   perspective: 1000px;
   user-select: none;
 }
@@ -413,36 +326,6 @@ onMounted(() => {
   color: #ffffff;
   overflow-y: auto;
   position: relative;
-}
-
-.speech-controls {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  display: flex;
-  gap: 8px;
-  z-index: 5;
-}
-
-.speak-btn {
-  background: #1890ff !important;
-  border-color: #1890ff !important;
-}
-
-.speak-btn:hover {
-  background: #40a9ff !important;
-  border-color: #40a9ff !important;
-}
-
-.stop-btn {
-  background: #ff4d4f !important;
-  border-color: #ff4d4f !important;
-  color: white !important;
-}
-
-.stop-btn:hover {
-  background: #ff7875 !important;
-  border-color: #ff7875 !important;
 }
 
 .word-content {
@@ -550,17 +433,6 @@ onMounted(() => {
   
   .search-filter .ant-select {
     width: 120px !important;
-  }
-  
-  .speech-controls {
-    top: 10px;
-    right: 10px;
-    gap: 5px;
-  }
-  
-  .speech-controls .ant-btn {
-    width: 35px !important;
-    height: 35px !important;
   }
   
   .controls {
