@@ -239,12 +239,26 @@ onMounted(() => {
 </script>
 
 <style scoped>
+  /* Reset toàn bộ margin/padding mặc định */
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 100%;
+  overflow: hidden; /* Ẩn scrollbar */
+}
+
 * {
   box-sizing: border-box;
 }
 
+/* CSS DESKTOP - Bỏ viền trắng */
 .flashcard-container {
   min-height: 100vh;
+  height: 100vh; /* Chiếm đủ chiều cao */
+  width: 100vw; /* Chiếm đủ chiều rộng */
+  position: fixed; /* Fix position để tránh scroll */
+  top: 0;
+  left: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -253,8 +267,7 @@ onMounted(() => {
   margin: 0;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   box-sizing: border-box;
-  width: 100vw;
-  overflow-x: hidden;
+  overflow: hidden; /* Ẩn overflow */
 }
 
 .loading {
@@ -271,6 +284,7 @@ onMounted(() => {
   gap: 20px;
   padding: 20px;
   box-sizing: border-box;
+  height: 100vh; /* Chiếm đủ chiều cao */
 }
 
 .controls-top {
@@ -393,81 +407,36 @@ onMounted(() => {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
-/* Mobile responsive */
+/* MOBILE RESPONSIVE - Bỏ viền trắng */
 @media (max-width: 768px) {
   .flashcard-container {
-    padding: 0;
-    margin: 0;
-  }
-  
-  .flashcard-wrapper {
-    padding: 10px;
-    max-width: 100%;
-  }
-  
-  .flashcard {
-    height: 450px;
-  }
-  
-  .card-front {
-    padding: 25px;
-  }
-  
-  .word-content {
-    font-size: 14px;
-  }
-  
-  .controls-top {
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .search-filter {
-    justify-content: center;
-  }
-  
-  /* Ẩn search input trên mobile */
-  .search-filter .ant-input-search {
-    display: none !important;
-  }
-  
-  /* Chỉ hiện sort dropdown */
-  .search-filter .ant-select {
-    width: 150px !important;
-  }
-  
-  /* Ẩn card counter trên mobile */
-  .card-counter {
-    display: none !important;
-  }
-  
-  .controls {
-    flex-direction: column;
-    gap: 10px;
-  }
-}
-
-/* Mobile responsive - Flashcard chiếm đủ màn hình */
-@media (max-width: 768px) {
-  .flashcard-container {
-    padding: 0;
-    margin: 0;
     min-height: 100vh;
-    height: 100vh; /* Đảm bảo chiếm đủ chiều cao viewport */
+    min-height: 100dvh; /* Dynamic viewport height */
+    height: 100vh;
+    height: 100dvh;
+    width: 100vw;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
   }
   
   .flashcard-wrapper {
     padding: 10px;
     max-width: 100%;
-    height: 100vh; /* Chiếm đủ chiều cao */
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Phân bổ không gian đều */
+    justify-content: space-between;
+    box-sizing: border-box;
   }
   
   .controls-top {
-    flex-shrink: 0; /* Không cho phép thu nhỏ */
+    flex-shrink: 0;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -475,9 +444,9 @@ onMounted(() => {
   }
   
   .flashcard {
-    height: calc(100vh - 120px); /* Chiếm gần hết màn hình, trừ phần controls */
-    flex: 1; /* Chiếm không gian còn lại */
-    min-height: 600px; /* Chiều cao tối thiểu */
+    height: calc(100dvh - 120px);
+    flex: 1;
+    min-height: 500px;
   }
   
   .card-front {
@@ -486,7 +455,7 @@ onMounted(() => {
   }
   
   .word-content {
-    font-size: 16px; /* Tăng font size cho dễ đọc */
+    font-size: 16px;
     line-height: 1.7;
   }
   
@@ -512,11 +481,11 @@ onMounted(() => {
   .controls {
     flex-direction: column;
     gap: 10px;
-    flex-shrink: 0; /* Không cho phép thu nhỏ */
+    flex-shrink: 0;
     margin-top: 10px;
   }
   
-  /* Thêm styles cho speak button trên mobile */
+  /* Speak button trên mobile */
   .speak-button {
     position: absolute !important;
     bottom: 20px !important;
@@ -525,10 +494,18 @@ onMounted(() => {
   }
 }
 
-/* Đối với màn hình rất nhỏ (điện thoại nhỏ) */
+/* Màn hình rất nhỏ - responsive hơn cho controls */
 @media (max-width: 480px) {
   .flashcard {
-    height: calc(100vh - 100px); /* Chiếm nhiều không gian hơn */
+    height: calc(100dvh - 90px); /* Giảm trừ ít hơn */
+  }
+  
+  .flashcard-container {
+    padding: 0;
+  }
+  
+  .flashcard-wrapper {
+    padding: 5px;
   }
   
   .card-front {
@@ -537,6 +514,20 @@ onMounted(() => {
   
   .word-content {
     font-size: 15px;
+  }
+  
+  /* Controls nhỏ hơn cho màn hình rất nhỏ */
+  .search-filter .ant-input-search {
+    width: 100px !important; /* Thu nhỏ hơn nữa */
+  }
+  
+  .search-filter .ant-select {
+    width: 85px !important;
+  }
+  
+  .card-counter {
+    font-size: 12px !important;
+    padding: 4px 8px !important;
   }
 }
 </style>
