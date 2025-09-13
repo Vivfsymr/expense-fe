@@ -407,7 +407,7 @@ html, body {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
-/* MOBILE RESPONSIVE - Bỏ viền trắng */
+/* MOBILE RESPONSIVE - Bỏ viền trắng + Hiện tất cả controls trên 1 dòng */
 @media (max-width: 768px) {
   .flashcard-container {
     min-height: 100vh;
@@ -437,14 +437,19 @@ html, body {
   
   .controls-top {
     flex-shrink: 0;
-    flex-direction: column;
+    flex-direction: row; /* Hiển thị ngang trên 1 dòng */
     align-items: center;
-    justify-content: center;
+    justify-content: space-between; /* Căn đều 2 bên */
     margin-bottom: 10px;
+    padding: 0 5px;
+    gap: 5px; /* Giảm gap để tiết kiệm không gian */
+    flex-wrap: nowrap; /* QUAN TRỌNG: Không cho xuống dòng */
+    width: 100%;
+    overflow: hidden; /* Ẩn overflow nếu quá dài */
   }
   
   .flashcard {
-    height: calc(100dvh - 120px);
+    height: calc(100dvh - 100px); /* Giảm trừ ít hơn vì controls gọn hơn */
     flex: 1;
     min-height: 500px;
   }
@@ -460,22 +465,48 @@ html, body {
   }
   
   .search-filter {
-    justify-content: center;
+    display: flex;
+    align-items: center;
+    gap: 5px; /* Giảm gap để tiết kiệm không gian */
+    flex-wrap: nowrap; /* Không cho xuống dòng */
+    flex-shrink: 1; /* Cho phép thu nhỏ nếu cần */
+    min-width: 0; /* Cho phép thu nhỏ xuống 0 */
   }
   
-  /* Ẩn search input trên mobile */
+  /* Hiện lại search input trên mobile nhưng thu nhỏ */
   .search-filter .ant-input-search {
-    display: none !important;
+    display: block !important; /* Force hiển thị */
+    width: 100px !important; /* Thu nhỏ search box hơn nữa */
+    flex-shrink: 1;
+    min-width: 80px; /* Width tối thiểu */
   }
   
-  /* Chỉ hiện sort dropdown */
+  .search-filter .ant-input {
+    display: block !important; /* Force input bên trong */
+  }
+  
+  /* Thu nhỏ sort dropdown */
   .search-filter .ant-select {
-    width: 150px !important;
+    display: block !important; /* Force hiển thị */
+    width: 90px !important; /* Thu nhỏ dropdown hơn */
+    flex-shrink: 1;
+    min-width: 80px;
   }
   
-  /* Ẩn card counter trên mobile */
+  /* Hiện lại card counter nhưng thu nhỏ */
   .card-counter {
-    display: none !important;
+    display: block !important; /* Force hiển thị */
+    color: white;
+    font-size: 12px !important; /* Giảm font size nhiều hơn */
+    font-weight: bold;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 8px !important; /* Giảm padding nhiều hơn */
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+    white-space: nowrap; /* Không xuống dòng */
+    flex-shrink: 0; /* Không cho thu nhỏ counter */
+    visibility: visible !important; /* Force visible */
+    min-width: fit-content; /* Width vừa đủ nội dung */
   }
   
   .controls {
@@ -519,7 +550,7 @@ html, body {
   /* Controls nhỏ hơn cho màn hình rất nhỏ */
   .search-filter .ant-input-search {
     display: block !important; /* Force hiển thị */
-    width: 100px !important; /* Thu nhỏ hơn nữa */
+    width: 90px !important; /* Thu nhỏ hơn nữa */
   }
   
   .search-filter .ant-input {
@@ -528,13 +559,13 @@ html, body {
   
   .search-filter .ant-select {
     display: block !important;
-    width: 85px !important;
+    width: 80px !important;
   }
   
   .card-counter {
     display: block !important;
-    font-size: 12px !important;
-    padding: 4px 8px !important;
+    font-size: 11px !important;
+    padding: 3px 6px !important;
     visibility: visible !important;
   }
 }
