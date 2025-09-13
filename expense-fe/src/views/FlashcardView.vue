@@ -239,7 +239,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-  /* Reset toàn bộ margin/padding mặc định */
+ /* Reset toàn bộ margin/padding mặc định */
 html, body {
   margin: 0 !important;
   padding: 0 !important;
@@ -518,16 +518,24 @@ html, body {
   
   /* Controls nhỏ hơn cho màn hình rất nhỏ */
   .search-filter .ant-input-search {
+    display: block !important; /* Force hiển thị */
     width: 100px !important; /* Thu nhỏ hơn nữa */
   }
   
+  .search-filter .ant-input {
+    display: block !important;
+  }
+  
   .search-filter .ant-select {
+    display: block !important;
     width: 85px !important;
   }
   
   .card-counter {
+    display: block !important;
     font-size: 12px !important;
     padding: 4px 8px !important;
+    visibility: visible !important;
   }
 }
 </style>
