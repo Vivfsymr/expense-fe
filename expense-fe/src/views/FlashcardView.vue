@@ -88,7 +88,7 @@ const touchEndY = ref(0);
 
 const currentWord = computed(() => words.value[currentIndex.value]);
 
-// 🟢 Hàm đọc từ tiếng Anh đầu tiên
+// 🟢 Hàm đọc từ tiếng Anh đầu tiên với giọng Anh-Mỹ
 const speakWord = () => {
   if (!currentWord.value || !currentWord.value.body) return;
 
@@ -98,8 +98,15 @@ const speakWord = () => {
 
   const wordToSpeak = match[0];
   const utterance = new SpeechSynthesisUtterance(wordToSpeak);
+  
+  // Chỉ dùng giọng Anh-Mỹ
   utterance.lang = 'en-US';
-  utterance.rate = 0.9; // tốc độ đọc (0.1 - 10)
+  utterance.rate = 0.85; // Tốc độ vừa phải
+  utterance.pitch = 1.0; // Cao độ bình thường
+  utterance.volume = 0.9; // Âm lượng
+  
+  console.log(`🔊 Speaking "${wordToSpeak}" with American English voice`);
+  
   speechSynthesis.speak(utterance);
 };
 
