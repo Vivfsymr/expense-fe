@@ -27,6 +27,9 @@
             <a-select-option value="beta">Z-A</a-select-option>
             <a-select-option value="random">Ngẫu nhiên</a-select-option>
           </a-select>
+          <a-button @click="loadMoreWords" v-if="hasMore" type="default" ghost>
+            Tải thêm
+          </a-button>
         </div>
         <div class="card-counter">
           {{ currentIndex + 1 }} / {{ words.length }}
@@ -53,12 +56,6 @@
             </a-button>
           </div>
         </div>
-      </div>
-      
-      <div class="controls">
-        <a-button @click="loadMoreWords" v-if="hasMore" type="default" ghost>
-          Tải thêm
-        </a-button>
       </div>
     </div>
     
@@ -328,12 +325,14 @@ html, body {
 
 .card-counter {
   color: white;
-  font-size: 18px;
+  font-size: 16px; /* Giảm từ 18px */
   font-weight: bold;
   background: rgba(255, 255, 255, 0.2);
-  padding: 10px 20px;
+  padding: 8px 16px; /* Giảm từ 10px 20px */
   border-radius: 20px;
   backdrop-filter: blur(10px);
+  flex-shrink: 0; /* Không cho counter thu nhỏ */
+  white-space: nowrap;
 }
 
 .flashcard {
@@ -403,14 +402,6 @@ html, body {
   width: 100%;
 }
 
-.controls {
-  display: flex;
-  gap: 15px;
-  align-items: center;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
 .swipe-hint {
   color: white;
   font-size: 14px;
@@ -428,6 +419,23 @@ html, body {
   padding: 40px;
   border-radius: 15px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* Speak button styles */
+.speak-button {
+  position: absolute !important;
+  bottom: 20px !important;
+  right: 20px !important;
+  z-index: 10;
+  background: rgba(64, 169, 255, 0.9) !important;
+  border: none !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.speak-button:hover {
+  background: rgba(64, 169, 255, 1) !important;
+  transform: scale(1.05);
 }
 
 /* MOBILE RESPONSIVE - Bỏ viền trắng + Hiện tất cả controls trên 1 dòng */
@@ -499,9 +507,9 @@ html, body {
   /* Hiện lại search input trên mobile nhưng thu nhỏ */
   .search-filter .ant-input-search {
     display: block !important; /* Force hiển thị */
-    width: 100px !important; /* Thu nhỏ search box hơn nữa */
+    width: 90px !important; /* Thu nhỏ search box hơn nữa */
     flex-shrink: 1;
-    min-width: 80px; /* Width tối thiểu */
+    min-width: 70px; /* Width tối thiểu */
   }
   
   .search-filter .ant-input {
@@ -511,9 +519,20 @@ html, body {
   /* Thu nhỏ sort dropdown */
   .search-filter .ant-select {
     display: block !important; /* Force hiển thị */
-    width: 90px !important; /* Thu nhỏ dropdown hơn */
+    width: 80px !important; /* Thu nhỏ dropdown hơn */
     flex-shrink: 1;
-    min-width: 80px;
+    min-width: 70px;
+  }
+  
+  /* Thu nhỏ nút Tải thêm */
+  .search-filter .ant-btn {
+    display: block !important; /* Force hiển thị */
+    padding: 4px 8px !important; /* Giảm padding */
+    font-size: 12px !important; /* Thu nhỏ font */
+    height: auto !important;
+    line-height: 1.2 !important;
+    flex-shrink: 0; /* Không cho thu nhỏ nút */
+    white-space: nowrap; /* Không xuống dòng */
   }
   
   /* Hiện lại card counter nhưng thu nhỏ */
@@ -530,13 +549,6 @@ html, body {
     flex-shrink: 0; /* Không cho thu nhỏ counter */
     visibility: visible !important; /* Force visible */
     min-width: fit-content; /* Width vừa đủ nội dung */
-  }
-  
-  .controls {
-    flex-direction: column;
-    gap: 10px;
-    flex-shrink: 0;
-    margin-top: 10px;
   }
   
   /* Speak button trên mobile */
@@ -568,13 +580,13 @@ html, body {
   
   .word-content {
     font-size: 14px;
-    line-height: 1.4 ; /* Line height nhỏ hơn */
+    line-height: 1.4; /* Line height nhỏ hơn */
   }
   
   /* Controls nhỏ hơn cho màn hình rất nhỏ */
   .search-filter .ant-input-search {
     display: block !important; /* Force hiển thị */
-    width: 90px !important; /* Thu nhỏ hơn nữa */
+    width: 80px !important; /* Thu nhỏ hơn nữa */
   }
   
   .search-filter .ant-input {
@@ -583,7 +595,13 @@ html, body {
   
   .search-filter .ant-select {
     display: block !important;
-    width: 80px !important;
+    width: 70px !important;
+  }
+  
+  .search-filter .ant-btn {
+    display: block !important;
+    padding: 3px 6px !important; /* Giảm padding hơn nữa */
+    font-size: 11px !important; /* Thu nhỏ font hơn */
   }
   
   .card-counter {
