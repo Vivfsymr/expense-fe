@@ -81,6 +81,7 @@ const sortOrder = ref<'alpha' | 'beta' | 'newest' | 'oldest' | 'random'>('newest
 const currentOffset = ref(0);
 const limit = ref(50);
 const hasMore = ref(true);
+const cardFrontRef = ref<HTMLDivElement | null>(null);
 
 // Touch handling for swipe
 const touchStartX = ref(0);
@@ -138,15 +139,17 @@ const loadWords = async (reset: boolean = false) => {
   }
 };
 
-const cardFrontRef = ref(null);
 
 // 2. Tạo hàm scroll to top
 const scrollToTop = () => {
-  if (cardFrontRef.value) {
+  if (cardFrontRef.value && cardFrontRef.value.scrollTo) {
     cardFrontRef.value.scrollTo({
       top: 0,
       behavior: 'smooth' // Smooth scroll hoặc 'auto' cho instant
     });
+  } else if (cardFrontRef.value) {
+    // Fallback cho browser cũ
+    cardFrontRef.value.scrollTop = 0;
   }
 };
 
