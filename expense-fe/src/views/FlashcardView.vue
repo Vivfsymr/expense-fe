@@ -447,4 +447,96 @@ onMounted(() => {
     gap: 10px;
   }
 }
+
+/* Mobile responsive - Flashcard chiếm đủ màn hình */
+@media (max-width: 768px) {
+  .flashcard-container {
+    padding: 0;
+    margin: 0;
+    min-height: 100vh;
+    height: 100vh; /* Đảm bảo chiếm đủ chiều cao viewport */
+  }
+  
+  .flashcard-wrapper {
+    padding: 10px;
+    max-width: 100%;
+    height: 100vh; /* Chiếm đủ chiều cao */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Phân bổ không gian đều */
+  }
+  
+  .controls-top {
+    flex-shrink: 0; /* Không cho phép thu nhỏ */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+  }
+  
+  .flashcard {
+    height: calc(100vh - 120px); /* Chiếm gần hết màn hình, trừ phần controls */
+    flex: 1; /* Chiếm không gian còn lại */
+    min-height: 600px; /* Chiều cao tối thiểu */
+  }
+  
+  .card-front {
+    padding: 20px;
+    height: 100%;
+  }
+  
+  .word-content {
+    font-size: 16px; /* Tăng font size cho dễ đọc */
+    line-height: 1.7;
+  }
+  
+  .search-filter {
+    justify-content: center;
+  }
+  
+  /* Ẩn search input trên mobile */
+  .search-filter .ant-input-search {
+    display: none !important;
+  }
+  
+  /* Chỉ hiện sort dropdown */
+  .search-filter .ant-select {
+    width: 150px !important;
+  }
+  
+  /* Ẩn card counter trên mobile */
+  .card-counter {
+    display: none !important;
+  }
+  
+  .controls {
+    flex-direction: column;
+    gap: 10px;
+    flex-shrink: 0; /* Không cho phép thu nhỏ */
+    margin-top: 10px;
+  }
+  
+  /* Thêm styles cho speak button trên mobile */
+  .speak-button {
+    position: absolute !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    z-index: 10;
+  }
+}
+
+/* Đối với màn hình rất nhỏ (điện thoại nhỏ) */
+@media (max-width: 480px) {
+  .flashcard {
+    height: calc(100vh - 100px); /* Chiếm nhiều không gian hơn */
+  }
+  
+  .card-front {
+    padding: 15px;
+  }
+  
+  .word-content {
+    font-size: 15px;
+  }
+}
 </style>
