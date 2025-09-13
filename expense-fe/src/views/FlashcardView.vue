@@ -483,8 +483,8 @@ html, body {
   }
   
   .word-content {
-    font-size: 16px;
-    line-height: 1.7;
+    font-size: 14px;
+    line-height: 1.4;
   }
   
   .search-filter {
@@ -567,7 +567,8 @@ html, body {
   }
   
   .word-content {
-    font-size: 15px;
+    font-size: 14px;
+    line-height: 1.4 ; /* Line height nhỏ hơn */
   }
   
   /* Controls nhỏ hơn cho màn hình rất nhỏ */
