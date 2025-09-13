@@ -419,20 +419,27 @@ onMounted(() => {
   
   .controls-top {
     flex-direction: column;
-    align-items: stretch;
+    align-items: center;
+    justify-content: center;
   }
   
   .search-filter {
     justify-content: center;
   }
   
+  /* Ẩn search input trên mobile */
   .search-filter .ant-input-search {
-    width: 100% !important;
-    max-width: 250px;
+    display: none !important;
   }
   
+  /* Chỉ hiện sort dropdown */
   .search-filter .ant-select {
-    width: 120px !important;
+    width: 150px !important;
+  }
+  
+  /* Ẩn card counter trên mobile */
+  .card-counter {
+    display: none !important;
   }
   
   .controls {
