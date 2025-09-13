@@ -40,7 +40,7 @@
         @touchend="handleTouchEnd"
       >
         <div class="card-inner">
-          <div class="card-front">
+          <div class="card-front" ref="cardFrontRef">
             <div class="word-content" v-html="formatWordContent(currentWord.body)"></div>
             <a-button 
               type="primary" 
@@ -138,6 +138,18 @@ const loadWords = async (reset: boolean = false) => {
   }
 };
 
+const cardFrontRef = ref(null);
+
+// 2. Tạo hàm scroll to top
+const scrollToTop = () => {
+  if (cardFrontRef.value) {
+    cardFrontRef.value.scrollTo({
+      top: 0,
+      behavior: 'smooth' // Smooth scroll hoặc 'auto' cho instant
+    });
+  }
+};
+
 const loadMoreWords = async () => {
   await loadWords(false);
 };
@@ -153,12 +165,20 @@ const handleSortChange = async () => {
 const nextCard = () => {
   if (currentIndex.value < words.value.length - 1) {
     currentIndex.value++;
+    // Scroll to top sau khi chuyển card
+    setTimeout(() => {
+      scrollToTop();
+    }, 50); // Delay nhỏ để đảm bảo DOM đã update
   }
 };
 
 const previousCard = () => {
   if (currentIndex.value > 0) {
     currentIndex.value--;
+    // Scroll to top sau khi chuyển card
+    setTimeout(() => {
+      scrollToTop();
+    }, 50); // Delay nhỏ để đảm bảo DOM đã update
   }
 };
 
