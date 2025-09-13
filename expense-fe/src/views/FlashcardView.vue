@@ -301,7 +301,7 @@ onMounted(() => {
 
 .flashcard {
   width: 100%;
-  height: 850px;
+  height: 900px;
   perspective: 1000px;
   user-select: none;
 }
