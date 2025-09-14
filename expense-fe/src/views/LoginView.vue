@@ -35,7 +35,7 @@ const onLogin = async () => {
   loading.value = true;
   try {
     await auth.login(form.value.username, form.value.password);
-    router.push('/flashcard');
+    router.push('/vocabulary');
   } catch (e) {
     error.value = e.message || 'Đăng nhập thất bại';
   } finally {

@@ -36,9 +36,16 @@ router.beforeEach((to, from, next) => {
   const publicPages = ['/login', '/register'];
   const authRequired = !publicPages.includes(to.path);
   const user = localStorage.getItem('user');
+  
   if (authRequired && !user) {
     return next('/login');
   }
+  
+  // Nếu đã đăng nhập và vào trang root, redirect đến vocabulary
+  if (to.path === '/' && user) {
+    return next('/vocabulary');
+  }
+  
   next();
 });
 
