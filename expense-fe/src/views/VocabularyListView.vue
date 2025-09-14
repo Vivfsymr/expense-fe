@@ -27,7 +27,7 @@
           </a-select>
         </div>
         <div class="word-counter" v-if="words.length > 0">
-          {{ words.length }} từ
+          {{ words.length }} từ (Trang {{ currentPage }})
         </div>
       </div>
     </div>
@@ -50,9 +50,25 @@
           </div>
         </div>
 
-        <div class="pagination" v-if="words.length > 0 && hasMore">
-          <a-button @click="loadMoreWords" type="primary" size="large" :loading="loadingMore">
-            {{ loadingMore ? 'Đang tải...' : 'Tải thêm từ vựng' }}
+        <div class="pagination" v-if="words.length > 0">
+          <a-button 
+            @click="goToPreviousPage" 
+            :disabled="currentPage === 1 || loading" 
+            type="default" 
+            size="large"
+            style="margin-right: 12px;"
+          >
+            ← Trước
+          </a-button>
+          <span class="page-info">Trang {{ currentPage }}</span>
+          <a-button 
+            @click="goToNextPage" 
+            :disabled="!hasMore || loading" 
+            type="primary" 
+            size="large"
+            style="margin-left: 12px;"
+          >
+            Tiếp →
           </a-button>
         </div>
       </div>
@@ -100,29 +116,17 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { wordService } from '../services/wordService'
 
-interface WordSummary {
-  _id: string
-  body: string
-}
-
-interface WordDetail {
-  _id: string
-  body: string
-  createAt: string
-}
-
 // Reactive data
-const words = ref<WordSummary[]>([])
+const words = ref([])
 const loading = ref(false)
-const loadingMore = ref(false)
 const loadingDetail = ref(false)
 const searchKeyword = ref('')
 const orderBy = ref('')
-const currentOffset = ref(0)
+const currentPage = ref(1)
 const limit = ref(50)
 const hasMore = ref(true)
 
@@ -131,69 +135,61 @@ const showBackToTop = ref(false)
 
 // Modal
 const showModal = ref(false)
-const wordDetail = ref<WordDetail | null>(null)
+const wordDetail = ref(null)
 
 // Methods
-const loadWords = async (append = false) => {
-  if (append) {
-    loadingMore.value = true
-  } else {
-    loading.value = true
-    words.value = []
-    currentOffset.value = 0
-  }
+const loadWords = async (page = 1) => {
+  loading.value = true
   
   try {
+    const offset = (page - 1) * limit.value
     const params = {
       keyword: searchKeyword.value || undefined,
       orderBy: orderBy.value || undefined,
-      offset: currentOffset.value,
+      offset: offset,
       limit: limit.value
     }
     const response = await wordService.getWordSummary(params)
     
-    if (append) {
-      words.value = [...words.value, ...response]
-    } else {
-      words.value = response
-    }
+    words.value = response // Thay thế hoàn toàn, không cộng dồn
+    currentPage.value = page
     
-    // Kiểm tra còn dữ liệu để tải thêm không
+    // Kiểm tra còn trang tiếp theo không
     hasMore.value = response.length === limit.value
     
   } catch (error) {
     console.error('Error loading words:', error)
-    if (!append) {
-      words.value = []
-    }
+    words.value = []
   } finally {
-    if (append) {
-      loadingMore.value = false
-    } else {
-      loading.value = false
-    }
+    loading.value = false
   }
 }
 
 const handleSearch = () => {
-  currentOffset.value = 0
+  currentPage.value = 1
   hasMore.value = true
-  loadWords(false)
+  loadWords(1)
 }
 
 const handleSortChange = () => {
-  currentOffset.value = 0
+  currentPage.value = 1
   hasMore.value = true
-  loadWords(false)
+  loadWords(1)
 }
 
-const loadMoreWords = () => {
-  if (!hasMore.value || loadingMore.value) return
-  currentOffset.value += limit.value
-  loadWords(true)
+const goToNextPage = () => {
+  if (!hasMore.value || loading.value) return
+  loadWords(currentPage.value + 1)
+  scrollToTop()
 }
 
-const showWordDetail = async (wordId: string) => {
+const goToPreviousPage = () => {
+  if (currentPage.value === 1 || loading.value) return
+  loadWords(currentPage.value - 1)
+  scrollToTop()
+}
+
+const showWordDetail = async (wordId) => {
   showModal.value = true
   loadingDetail.value = true
   wordDetail.value = null
@@ -213,7 +209,7 @@ const closeModal = () => {
   wordDetail.value = null
 }
 
-const formatWordContent = (content: string) => {
+const formatWordContent = (content) => {
   if (!content) return ''
   return content.replace(/\\n/g, '<br>')
 }
@@ -251,14 +247,14 @@ const scrollToTop = () => {
   }
 }
 
-const handleScroll = (event: Event) => {
-  const scrollContainer = event.target as HTMLElement
+const handleScroll = (event) => {
+  const scrollContainer = event.target
   showBackToTop.value = scrollContainer.scrollTop > 500
 }
 
 // Lifecycle
 onMounted(() => {
-  loadWords(false)
+  loadWords(1)
   // Add scroll listener to the scroll container
   const scrollContainer = document.querySelector('.vocabulary-scroll-container')
   if (scrollContainer) {
@@ -396,6 +392,14 @@ onUnmounted(() => {
   align-items: center;
   margin-top: 30px;
   padding: 20px 0;
+  gap: 12px;
+}
+
+.page-info {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 16px;
+  font-weight: 500;
+  padding: 0 16px;
 }
 
 /* Modal styles */

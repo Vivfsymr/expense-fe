@@ -27,12 +27,15 @@
             <a-select-option value="beta">Z-A</a-select-option>
             <a-select-option value="random">Ngẫu nhiên</a-select-option>
           </a-select>
-          <a-button @click="loadMoreWords" v-if="hasMore" type="default" ghost>
-            Tải thêm
+          <a-button @click="goToPreviousPage" v-if="currentPage > 1" type="default" ghost style="margin-right: 8px;">
+            ← Trước
+          </a-button>
+          <a-button @click="goToNextPage" v-if="hasMore" type="default" ghost>
+            Tiếp →
           </a-button>
         </div>
         <div class="card-counter">
-          {{ currentIndex + 1 }} / {{ words.length }}
+          {{ currentIndex + 1 }} / {{ words.length }} (Trang {{ currentPage }})
         </div>
       </div>
       
@@ -75,7 +78,7 @@ const currentIndex = ref(0);
 const loading = ref(true);
 const searchKeyword = ref('');
 const sortOrder = ref<'alpha' | 'beta' | 'newest' | 'oldest' | 'random'>('newest');
-const currentOffset = ref(0);
+const currentPage = ref(1);
 const limit = ref(50);
 const hasMore = ref(true);
 const cardFrontRef = ref<HTMLDivElement | null>(null);
@@ -110,13 +113,14 @@ const speakWord = () => {
   speechSynthesis.speak(utterance);
 };
 
-const loadWords = async (reset: boolean = false) => {
+const loadWords = async (page: number = 1) => {
   try {
     loading.value = true;
     
+    const offset = (page - 1) * limit.value;
     const params: WordQueryParams = {
       orderBy: sortOrder.value,
-      offset: reset ? 0 : currentOffset.value,
+      offset: offset,
       limit: limit.value
     };
     
@@ -126,14 +130,9 @@ const loadWords = async (reset: boolean = false) => {
     
     const data = await wordService.getWords(params);
     
-    if (reset) {
-      words.value = data;
-      currentIndex.value = 0;
-      currentOffset.value = data.length;
-    } else {
-      words.value = [...words.value, ...data];
-      currentOffset.value += data.length;
-    }
+    words.value = data; // Thay thế hoàn toàn, không cộng dồn
+    currentPage.value = page;
+    currentIndex.value = 0; // Reset về card đầu tiên
     
     hasMore.value = data.length === limit.value;
   } catch (error) {
@@ -157,16 +156,26 @@ const scrollToTop = () => {
   }
 };
 
-const loadMoreWords = async () => {
-  await loadWords(false);
+const goToNextPage = async () => {
+  if (!hasMore.value) return;
+  await loadWords(currentPage.value + 1);
+  scrollToTop();
+};
+
+const goToPreviousPage = async () => {
+  if (currentPage.value === 1) return;
+  await loadWords(currentPage.value - 1);
+  scrollToTop();
 };
 
 const searchWords = async () => {
-  await loadWords(true);
+  currentPage.value = 1;
+  await loadWords(1);
 };
 
 const handleSortChange = async () => {
-  await loadWords(true);
+  currentPage.value = 1;
+  await loadWords(1);
 };
 
 const nextCard = () => {
@@ -243,7 +252,7 @@ const formatWordContent = (content: string) => {
 };
 
 onMounted(() => {
-  loadWords(true);
+  loadWords(1);
   
   // Add keyboard support
   const handleKeydown = (e: KeyboardEvent) => {
