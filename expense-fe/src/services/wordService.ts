@@ -6,9 +6,14 @@ export interface Word {
   createAt: string;
 }
 
+export interface WordSummary {
+  _id: string;
+  body: string;
+}
+
 export interface WordQueryParams {
   keyword?: string;
-  orderBy?: 'alpha' | 'beta' | 'newest' | 'oldest' | 'random';
+  orderBy?: string;
   offset?: number;
   limit?: number;
 }
@@ -26,6 +31,26 @@ export const wordService = {
     const url = `/words${queryString ? '?' + queryString : ''}`;
     
     const response = await api.get(url);
+    return response.data;
+  },
+
+  getWordSummary: async (params: WordQueryParams = {}): Promise<WordSummary[]> => {
+    const queryParams = new URLSearchParams();
+    
+    if (params.keyword) queryParams.append('keyword', params.keyword);
+    if (params.orderBy) queryParams.append('orderBy', params.orderBy);
+    if (params.offset !== undefined) queryParams.append('offset', params.offset.toString());
+    if (params.limit !== undefined) queryParams.append('limit', params.limit.toString());
+    
+    const queryString = queryParams.toString();
+    const url = `/words/summary${queryString ? '?' + queryString : ''}`;
+    
+    const response = await api.get(url);
+    return response.data;
+  },
+
+  getWordDetail: async (id: string): Promise<Word> => {
+    const response = await api.get(`/words/${id}`);
     return response.data;
   }
 };

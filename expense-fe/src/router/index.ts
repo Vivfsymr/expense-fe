@@ -24,6 +24,11 @@ const router = createRouter({
       name: 'flashcard',
       component: () => import('../views/FlashcardView.vue'),
     },
+    {
+      path: '/vocabulary',
+      name: 'vocabulary',
+      component: () => import('../views/VocabularyListView.vue'),
+    },
   ],
 })
 

@@ -4,6 +4,7 @@
     </div>
     <a-menu mode="horizontal" :selectedKeys="[selectedKey]" class="header-menu" @click="onMenuClick">
       <a-menu-item key="flashcard">Flashcard</a-menu-item>
+      <a-menu-item key="vocabulary">Từ vựng</a-menu-item>
     </a-menu>
     <div class="header-user" v-if="user">
       <a-avatar :size="32" style="margin-right: 8px; background: #1677ff;">
@@ -28,11 +29,13 @@ const route = useRoute();
 
 const selectedKey = computed(() => {
   if (route.path.startsWith('/flashcard')) return 'flashcard';
+  if (route.path.startsWith('/vocabulary')) return 'vocabulary';
   return '';
 });
 
 const onMenuClick = (e: any) => {
   if (e.key === 'flashcard') router.push('/flashcard');
+  if (e.key === 'vocabulary') router.push('/vocabulary');
 };
 
 const logout = () => {
