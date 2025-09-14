@@ -416,9 +416,9 @@ onUnmounted(() => {
   background: #1a1a1a;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
-  max-width: 500px;
-  width: 80%;
-  max-height: 80vh;
+  max-width: 600px;
+  width: 85%;
+  max-height: 85vh;
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
@@ -483,16 +483,16 @@ onUnmounted(() => {
 }
 
 .modal-body {
-  padding: 12px 15px 15px 15px;
-  max-height: 60vh;
+  padding: 15px 18px 18px 18px;
+  max-height: 70vh;
   overflow-y: auto;
   background: #1a1a1a;
 }
 
 .detail-content {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  font-size: 13px;
-  line-height: 1.5;
+  font-size: 14px;
+  line-height: 1.6;
   color: #ffffff;
   margin: 0;
   word-wrap: break-word;
