@@ -416,9 +416,9 @@ onUnmounted(() => {
   background: #1a1a1a;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
-  max-width: 600px;
-  width: 85%;
-  max-height: 100vh;
+  max-width: 500px;
+  width: 80%;
+  max-height: 80vh;
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
@@ -427,7 +427,7 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 18px;
+  padding: 12px 15px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   background: #2a2a2a;
 }
@@ -435,19 +435,19 @@ onUnmounted(() => {
 .modal-header h2 {
   margin: 0;
   color: #ffffff;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .speak-button {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border: none;
-  font-size: 16px;
+  font-size: 14px;
   transition: all 0.3s ease;
 }
 
@@ -483,8 +483,8 @@ onUnmounted(() => {
 }
 
 .modal-body {
-  padding: 15px 18px 18px 18px;
-  max-height: 100vh;
+  padding: 12px 15px 15px 15px;
+  max-height: 60vh;
   overflow-y: auto;
   background: #1a1a1a;
 }
