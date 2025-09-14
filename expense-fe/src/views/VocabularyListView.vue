@@ -416,8 +416,8 @@ onUnmounted(() => {
   background: #1a1a1a;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
-  max-width: 800px;
-  width: 90%;
+  max-width: 600px;
+  width: 85%;
   max-height: 100vh;
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
@@ -427,7 +427,7 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
+  padding: 15px 18px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   background: #2a2a2a;
 }
@@ -435,7 +435,7 @@ onUnmounted(() => {
 .modal-header h2 {
   margin: 0;
   color: #ffffff;
-  font-size: 20px;
+  font-size: 18px;
 }
 
 .header-actions {
@@ -483,7 +483,7 @@ onUnmounted(() => {
 }
 
 .modal-body {
-  padding: 20px;
+  padding: 15px 18px 18px 18px;
   max-height: 100vh;
   overflow-y: auto;
   background: #1a1a1a;
@@ -491,8 +491,8 @@ onUnmounted(() => {
 
 .detail-content {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  font-size: 14px;
-  line-height: 1.6;
+  font-size: 13px;
+  line-height: 1.5;
   color: #ffffff;
   margin: 0;
   word-wrap: break-word;
@@ -559,12 +559,20 @@ onUnmounted(() => {
   }
 
   .vocabulary-scroll-container {
-    padding: 15px;
+    padding: 10px;
   }
+
+  .vocabulary-list-container {
+    gap: 8px;
   }
 
   .vocabulary-item {
-    padding: 14px 16px;
+    padding: 10px 12px;
+  }
+
+  .word-body {
+    font-size: 14px;
+    line-height: 1.4;
   }
 
   .modal-content {
@@ -585,7 +593,7 @@ onUnmounted(() => {
     bottom: 20px;
     right: 20px;
   }
-
+}
 
 @media (max-width: 480px) {
   .vocabulary-list {
@@ -594,6 +602,36 @@ onUnmounted(() => {
   
   .header h1 {
     font-size: 20px;
+  }
+
+  .vocabulary-list-container {
+    gap: 6px;
+  }
+
+  .vocabulary-item {
+    padding: 8px 10px;
+    border-radius: 6px;
+  }
+
+  .word-body {
+    font-size: 13px;
+    line-height: 1.3;
+  }
+
+  .vocabulary-scroll-container {
+    padding: 8px;
+  }
+
+  .header {
+    padding: 10px;
+  }
+
+  .controls {
+    gap: 10px;
+  }
+
+  .search-filter {
+    gap: 8px;
   }
 }
 </style>
