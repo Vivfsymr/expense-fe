@@ -106,7 +106,6 @@ body {
   background: transparent !important;
 }
 </style>
-</style>
 
 <script setup>
 import { ref, watch } from 'vue'
