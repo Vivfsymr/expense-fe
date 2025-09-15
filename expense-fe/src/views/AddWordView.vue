@@ -20,29 +20,6 @@
 </template>
 
 <style scoped>
-.add-word-dark {
-  max-width: 800px;
-  margin: 40px auto;
-  padding: 32px 24px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #f3f3f3;
-  box-shadow: 0 4px 24px 0 rgba(0,0,0,0.25);
-  position: relative;
-}
-
-/* Add gradient border effect */
-.add-word-dark::before {
-  content: '';
-  position: absolute;
-  top: -3px;
-  left: -3px;
-  right: -3px;
-  bottom: -3px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-  border-radius: 19px;
-  z-index: -1;
-}
 
 label {
   color: #fff;
