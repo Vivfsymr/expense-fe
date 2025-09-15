@@ -91,13 +91,22 @@ label {
   font-weight: bold;
 }
 </style>
+</style>
 <style>
-body {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+html, body {
+  height: 100%;
   min-height: 100vh;
   margin: 0;
   padding: 0;
 }
+html {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  min-height: 100vh;
+}
+body {
+  background: transparent !important;
+}
+</style>
 </style>
 
 <script setup>
