@@ -182,6 +182,7 @@ const handleDeleteWord = async (id) => {
     loading.value = true;
     await wordService.deleteWord(id);
     await loadWords(currentPage.value);
+    closeModal();
   } catch (e) {
     alert('Xoá thất bại!');
   } finally {
