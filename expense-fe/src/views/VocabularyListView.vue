@@ -44,10 +44,31 @@
             v-for="word in words"
             :key="word._id"
             class="vocabulary-item"
-            @click="showWordDetail(word._id)"
           >
-            <div class="word-body">{{ word.body }}</div>
+            <div class="word-body" @click="showWordDetail(word._id)">{{ word.body }}</div>
+            <a-button 
+              danger 
+              shape="circle" 
+              size="small" 
+              class="delete-btn"
+              @click.stop="handleDeleteWord(word._id)"
+              title="Xoá từ này"
+              style="margin-left: 12px; float: right;"
+            >🗑️</a-button>
           </div>
+const handleDeleteWord = async (id) => {
+  if (!id) return;
+  if (!confirm('Bạn có chắc muốn xoá từ này?')) return;
+  try {
+    loading.value = true;
+    await wordService.deleteWord(id);
+    await loadWords(currentPage.value);
+  } catch (e) {
+    alert('Xoá thất bại!');
+  } finally {
+    loading.value = false;
+  }
+};
         </div>
 
         <div class="pagination" v-if="words.length > 0">
@@ -639,3 +660,14 @@ onUnmounted(() => {
   }
 }
 </style>
+.delete-btn {
+  background: #fff !important;
+  color: #c00 !important;
+  border: 1px solid #c00 !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+  transition: background 0.2s;
+}
+.delete-btn:hover {
+  background: #c00 !important;
+  color: #fff !important;
+}
