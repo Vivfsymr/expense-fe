@@ -91,7 +91,6 @@ label {
   font-weight: bold;
 }
 </style>
-</style>
 <style>
 html, body {
   height: 100%;
