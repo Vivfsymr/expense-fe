@@ -46,29 +46,8 @@
             class="vocabulary-item"
           >
             <div class="word-body" @click="showWordDetail(word._id)">{{ word.body }}</div>
-            <a-button 
-              danger 
-              shape="circle" 
-              size="small" 
-              class="delete-btn"
-              @click.stop="handleDeleteWord(word._id)"
-              title="Xoá từ này"
-              style="margin-left: 12px; float: right;"
-            >🗑️</a-button>
           </div>
-const handleDeleteWord = async (id) => {
-  if (!id) return;
-  if (!confirm('Bạn có chắc muốn xoá từ này?')) return;
-  try {
-    loading.value = true;
-    await wordService.deleteWord(id);
-    await loadWords(currentPage.value);
-  } catch (e) {
-    alert('Xoá thất bại!');
-  } finally {
-    loading.value = false;
-  }
-};
+
         </div>
 
         <div class="pagination" v-if="words.length > 0">
@@ -119,6 +98,16 @@ const handleDeleteWord = async (id) => {
             >
               🔊
             </a-button>
+            <a-button 
+              danger 
+              shape="circle" 
+              size="large" 
+              class="delete-btn"
+              @click="handleDeleteWord(wordDetail?._id)"
+              :disabled="!wordDetail"
+              title="Xoá từ này"
+              style="margin-left: 8px;"
+            >🗑️</a-button>
             <button @click="closeModal" class="close-btn">&times;</button>
           </div>
         </div>
@@ -183,6 +172,20 @@ const loadWords = async (page = 1) => {
     words.value = []
   } finally {
     loading.value = false
+  }
+}
+
+const handleDeleteWord = async (id) => {
+  if (!id) return;
+  if (!confirm('Bạn có chắc muốn xoá từ này?')) return;
+  try {
+    loading.value = true;
+    await wordService.deleteWord(id);
+    await loadWords(currentPage.value);
+  } catch (e) {
+    alert('Xoá thất bại!');
+  } finally {
+    loading.value = false;
   }
 }
 
