@@ -20,52 +20,41 @@
 </template>
 
 <style scoped>
+
 .add-word-dark {
   max-width: 800px;
   margin: 40px auto;
   padding: 32px 24px;
   border-radius: 16px;
-  color: #f3f3f3;
-  box-shadow: 0 4px 24px 0 rgba(0,0,0,0.25);
-  position: relative;
-}
-
-/* Add gradient border effect */
-.add-word-dark::before {
-  content: '';
-  position: absolute;
-  top: -3px;
-  left: -3px;
-  right: -3px;
-  bottom: -3px;
-  border-radius: 19px;
-  z-index: -1;
+  background: #fff;
+  color: #222;
+  box-shadow: 0 4px 24px 0 rgba(0,0,0,0.10);
 }
 
 label {
-  color: #fff;
+  color: #222;
   font-size: 1.1rem;
   margin-bottom: 8px;
   display: block;
 }
 .dark-textarea {
   width: 100%;
-  background: #18191a;
-  color: #f3f3f3;
-  border: 1px solid #333;
+  background: #f5f5f5;
+  color: #222;
+  border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 1.05rem;
   padding: 12px;
   margin-bottom: 16px;
   resize: vertical;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 .dark-textarea::placeholder {
-  color: #888;
+  color: #aaa;
 }
 .dark-pre {
-  background: #18191a;
-  color: #00e676;
+  background: #222;
+  color: #fff;
   padding: 14px;
   border-radius: 8px;
   font-size: 1.05rem;
@@ -74,7 +63,7 @@ label {
   word-break: break-all;
 }
 .dark-btn {
-  background: linear-gradient(90deg, #00c6ff 0%, #0072ff 100%);
+  background: #222;
   color: #fff;
   border: none;
   border-radius: 6px;
@@ -83,21 +72,21 @@ label {
   font-weight: bold;
   cursor: pointer;
   margin-top: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
   transition: background 0.2s;
 }
 .dark-btn:disabled {
-  background: #444;
-  color: #aaa;
+  background: #ccc;
+  color: #888;
   cursor: not-allowed;
 }
 .success-msg {
-  color: #00e676;
+  color: #1a8917;
   margin-top: 12px;
   font-weight: bold;
 }
 .error-msg {
-  color: #ff5252;
+  color: #c00;
   margin-top: 12px;
   font-weight: bold;
 }
