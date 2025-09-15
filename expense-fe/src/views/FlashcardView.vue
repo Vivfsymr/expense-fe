@@ -47,6 +47,16 @@
       >
         <div class="card-inner">
           <div class="card-front" ref="cardFrontRef">
+            <a-button 
+              danger 
+              shape="circle" 
+              size="small" 
+              class="delete-button" 
+              @click="handleDeleteWord"
+              style="position: absolute; top: 16px; right: 16px; z-index: 20;"
+            >
+              🗑️
+            </a-button>
             <div class="word-content" v-html="formatWordContent(currentWord.body)"></div>
             <a-button 
               type="primary" 
@@ -236,6 +246,24 @@ const handleSwipe = () => {
 
 const formatDate = (dateString: string) => {
   return dayjs(dateString).format('DD/MM/YYYY HH:mm');
+};
+
+const handleDeleteWord = async () => {
+  if (!currentWord.value || !currentWord.value._id) return;
+  if (!confirm('Bạn có chắc muốn xoá từ này?')) return;
+  try {
+    loading.value = true;
+    await wordService.deleteWord(currentWord.value._id);
+    // Nếu còn nhiều hơn 1 từ, chuyển về card trước nếu đang ở cuối
+    if (currentIndex.value === words.value.length - 1 && currentIndex.value > 0) {
+      currentIndex.value--;
+    }
+    await loadWords(currentPage.value);
+  } catch (e) {
+    alert('Xoá thất bại!');
+  } finally {
+    loading.value = false;
+  }
 };
 
 const formatWordContent = (content: string) => {
@@ -447,6 +475,18 @@ html, body {
   border: none !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(10px);
+}
+
+.delete-button {
+  background: #fff !important;
+  color: #c00 !important;
+  border: 1px solid #c00 !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+  transition: background 0.2s;
+}
+.delete-button:hover {
+  background: #c00 !important;
+  color: #fff !important;
 }
 
 .speak-button:hover {

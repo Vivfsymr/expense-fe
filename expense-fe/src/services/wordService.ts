@@ -49,8 +49,13 @@ export const wordService = {
     return response.data;
   },
 
+
   getWordDetail: async (id: string): Promise<Word> => {
     const response = await api.get(`/words/${id}`);
     return response.data;
+  },
+
+  deleteWord: async (id: string): Promise<void> => {
+    await api.delete(`/words/${id}`);
   }
 };
