@@ -20,16 +20,14 @@
     <div v-if="error" class="error-msg">{{ error }}</div>
   </div>
 
-</template>
-
-
+ </template>
 <style scoped>
 .add-word-dark {
   max-width: 800px;
   margin: 40px auto;
   padding: 32px 24px;
   border-radius: 16px;
-  background: linear-gradient(135deg, #232526 0%, #414345 100%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: #f3f3f3;
   box-shadow: 0 4px 24px 0 rgba(0,0,0,0.25);
 }
@@ -91,6 +89,14 @@ label {
   color: #ff5252;
   margin-top: 12px;
   font-weight: bold;
+}
+</style>
+<style>
+body {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
 }
 </style>
 
