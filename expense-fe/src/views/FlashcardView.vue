@@ -356,7 +356,7 @@ html, body {
 
 .flashcard {
   width: 100%;
-  height: 940px;
+  height: 900px;
   perspective: 1000px;
   user-select: none;
 }
