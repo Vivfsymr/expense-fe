@@ -24,6 +24,7 @@
             <a-select-option value="alpha">A-Z</a-select-option>
             <a-select-option value="beta">Z-A</a-select-option>
             <a-select-option value="random">Ngẫu nhiên</a-select-option>
+            <a-select-option value="bookmark">Bookmark</a-select-option>
           </a-select>
         </div>
         <div class="word-counter" v-if="words.length > 0">
@@ -44,10 +45,10 @@
             v-for="word in words"
             :key="word._id"
             class="vocabulary-item"
-            @click="showWordDetail(word._id)"
           >
-            <div class="word-body">{{ word.body }}</div>
+            <div class="word-body" @click="showWordDetail(word._id)">{{ word.body }}</div>
           </div>
+
         </div>
 
         <div class="pagination" v-if="words.length > 0">
@@ -99,17 +100,28 @@
               🔊
             </a-button>
             <a-button 
-              type="default"
+              :type="wordDetail && wordDetail.bookMark ? 'primary' : 'default'"
               shape="circle"
               size="large"
               class="bookmark-button"
-              @click="bookmarkWord"
+              @click="toggleBookmark"
               :disabled="!wordDetail"
-              title="Bookmark từ này"
+              :title="wordDetail && wordDetail.bookMark ? 'Bỏ bookmark' : 'Bookmark từ này'"
               style="margin-left: 8px;"
             >
-              ⭐
+              <span v-if="wordDetail && wordDetail.bookMark">★</span>
+              <span v-else>☆</span>
             </a-button>
+            <a-button 
+               type="danger"
+              shape="circle" 
+              size="large" 
+              class="delete-btn"
+              @click="handleDeleteWord(wordDetail?._id)"
+              :disabled="!wordDetail"
+              title="Xoá từ này"
+              style="margin-left: 8px;"
+            >🗑️</a-button>
             <button @click="closeModal" class="close-btn">&times;</button>
           </div>
         </div>
@@ -155,25 +167,37 @@ const loadWords = async (page = 1) => {
   
   try {
     const offset = (page - 1) * limit.value
-    const params = {
-      keyword: searchKeyword.value || undefined,
+      const params = {
+        keyword: searchKeyword.value || undefined,
       orderBy: orderBy.value || undefined,
-      offset: offset,
-      limit: limit.value
-    }
+        offset: offset,
+        limit: limit.value
+      }
     const response = await wordService.getWordSummary(params)
-    
     words.value = response // Thay thế hoàn toàn, không cộng dồn
     currentPage.value = page
-    
     // Kiểm tra còn trang tiếp theo không
     hasMore.value = response.length === limit.value
-    
   } catch (error) {
     console.error('Error loading words:', error)
     words.value = []
   } finally {
     loading.value = false
+  }
+}
+
+const handleDeleteWord = async (id) => {
+  if (!id) return;
+  if (!confirm('Bạn có chắc muốn xoá từ này?')) return;
+  try {
+    loading.value = true;
+    await wordService.deleteWord(id);
+    await loadWords(currentPage.value);
+    closeModal();
+  } catch (e) {
+    alert('Xoá thất bại!');
+  } finally {
+    loading.value = false;
   }
 }
 
@@ -183,13 +207,19 @@ const handleSearch = () => {
   loadWords(1)
 }
 
-const bookmarkWord = async () => {
+const toggleBookmark = async () => {
   if (!wordDetail.value || !wordDetail.value._id) return;
+  const newValue = !wordDetail.value.bookMark;
   try {
-    await wordService.bookmarkWord(wordDetail.value._id, true);
-    window.$message ? window.$message.success('Đã bookmark!') : alert('Đã bookmark!');
+    await wordService.bookmarkWord(wordDetail.value._id, newValue);
+    wordDetail.value.bookMark = newValue;
+    window.$message
+      ? window.$message.success(newValue ? 'Đã bookmark!' : 'Đã bỏ bookmark!')
+      : alert(newValue ? 'Đã bookmark!' : 'Đã bỏ bookmark!');
   } catch (e) {
-    window.$message ? window.$message.error('Bookmark thất bại!') : alert('Bookmark thất bại!');
+    window.$message
+      ? window.$message.error('Thao tác bookmark thất bại!')
+      : alert('Thao tác bookmark thất bại!');
   }
 }
 
@@ -661,3 +691,14 @@ onUnmounted(() => {
   }
 }
 </style>
+.delete-btn {
+  background: #fff !important;
+  color: #c00 !important;
+  border: 1px solid #c00 !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+  transition: background 0.2s;
+}
+.delete-btn:hover {
+  background: #c00 !important;
+  color: #fff !important;
+}

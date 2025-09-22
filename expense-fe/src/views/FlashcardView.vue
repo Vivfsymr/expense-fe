@@ -47,6 +47,7 @@
       >
         <div class="card-inner">
           <div class="card-front" ref="cardFrontRef">
+            <!-- Nút xoá đã bị xoá, chỉ còn nút speak -->
             <div class="word-content" v-html="formatWordContent(currentWord.body)"></div>
             <a-button 
               type="primary" 
@@ -238,6 +239,8 @@ const formatDate = (dateString: string) => {
   return dayjs(dateString).format('DD/MM/YYYY HH:mm');
 };
 
+
+
 const formatWordContent = (content: string) => {
   // Format the word content with better styling
   return content
@@ -353,7 +356,7 @@ html, body {
 
 .flashcard {
   width: 100%;
-  height: 940px;
+  height: 900px;
   perspective: 1000px;
   user-select: none;
 }
@@ -448,6 +451,8 @@ html, body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(10px);
 }
+
+
 
 .speak-button:hover {
   background: rgba(64, 169, 255, 1) !important;
