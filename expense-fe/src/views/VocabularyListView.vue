@@ -98,6 +98,18 @@
             >
               🔊
             </a-button>
+            <a-button 
+              type="default"
+              shape="circle"
+              size="large"
+              class="bookmark-button"
+              @click="bookmarkWord"
+              :disabled="!wordDetail"
+              title="Bookmark từ này"
+              style="margin-left: 8px;"
+            >
+              ⭐
+            </a-button>
             <button @click="closeModal" class="close-btn">&times;</button>
           </div>
         </div>
@@ -169,6 +181,16 @@ const handleSearch = () => {
   currentPage.value = 1
   hasMore.value = true
   loadWords(1)
+}
+
+const bookmarkWord = async () => {
+  if (!wordDetail.value || !wordDetail.value._id) return;
+  try {
+    await wordService.bookmarkWord(wordDetail.value._id, true);
+    window.$message ? window.$message.success('Đã bookmark!') : alert('Đã bookmark!');
+  } catch (e) {
+    window.$message ? window.$message.error('Bookmark thất bại!') : alert('Bookmark thất bại!');
+  }
 }
 
 const handleSortChange = () => {

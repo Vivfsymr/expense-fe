@@ -52,5 +52,10 @@ export const wordService = {
   getWordDetail: async (id: string): Promise<Word> => {
     const response = await api.get(`/words/${id}`);
     return response.data;
+  },
+
+  bookmarkWord: async (id: string, value: boolean = true) => {
+    const response = await api.post(`/words/bookmark/${id}?value=${value}`);
+    return response.data;
   }
 };
