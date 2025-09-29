@@ -52,25 +52,17 @@
         </div>
 
         <div class="pagination" v-if="words.length > 0">
-          <a-button 
-            @click="goToPreviousPage" 
-            :disabled="currentPage === 1 || loading" 
-            type="default" 
-            size="large"
-            style="margin-right: 12px;"
-          >
-            ← Trước
-          </a-button>
-          <span class="page-info">Trang {{ currentPage }}</span>
-          <a-button 
-            @click="goToNextPage" 
-            :disabled="!hasMore || loading" 
-            type="primary" 
-            size="large"
-            style="margin-left: 12px;"
-          >
-            Tiếp →
-          </a-button>
+          <a-pagination
+            :current="currentPage"
+            :page-size="limit"
+            :total="total"
+            @change="onPageChange"
+            show-size-changer="false"
+            :show-less-items="true"
+            :show-quick-jumper="false"
+            style="margin: 0 auto;"
+          />
+          <span class="page-info">Trang {{ currentPage }} / {{ Math.ceil(total/limit) }}</span>
         </div>
       </div>
     </div>
@@ -153,6 +145,7 @@ const orderBy = ref('')
 const currentPage = ref(1)
 const limit = ref(50)
 const hasMore = ref(true)
+const total = ref(0)
 
 // Back to top
 const showBackToTop = ref(false)
@@ -164,20 +157,19 @@ const wordDetail = ref(null)
 // Methods
 const loadWords = async (page = 1) => {
   loading.value = true
-  
   try {
     const offset = (page - 1) * limit.value
-      const params = {
-        keyword: searchKeyword.value || undefined,
+    const params = {
+      keyword: searchKeyword.value || undefined,
       orderBy: orderBy.value || undefined,
-        offset: offset,
-        limit: limit.value
-      }
+      offset: offset,
+      limit: limit.value
+    }
     const response = await wordService.getWordSummary(params)
-    words.value = response // Thay thế hoàn toàn, không cộng dồn
+    words.value = response.items || []
+    total.value = typeof response.total === 'number' ? response.total : words.value.length
     currentPage.value = page
-    // Kiểm tra còn trang tiếp theo không
-    hasMore.value = response.length === limit.value
+    hasMore.value = words.value.length === limit.value
   } catch (error) {
     console.error('Error loading words:', error)
     words.value = []
@@ -227,6 +219,11 @@ const handleSortChange = () => {
   currentPage.value = 1
   hasMore.value = true
   loadWords(1)
+}
+
+const onPageChange = (page) => {
+  loadWords(page)
+  scrollToTop()
 }
 
 const goToNextPage = () => {
@@ -323,6 +320,10 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+:deep(.ant-pagination-options) {
+  display: none !important;
+}
+
 .vocabulary-list {
   height: 100vh;
   display: flex;
@@ -690,8 +691,7 @@ onUnmounted(() => {
     gap: 8px;
   }
 }
-</style>
-.delete-btn {
+  .delete-btn {
   background: #fff !important;
   color: #c00 !important;
   border: 1px solid #c00 !important;
@@ -702,3 +702,4 @@ onUnmounted(() => {
   background: #c00 !important;
   color: #fff !important;
 }
+</style>
