@@ -135,6 +135,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { wordService } from '../services/wordService'
+import { useRoute, useRouter } from 'vue-router'
 
 // Reactive data
 const words = ref([])
@@ -147,6 +148,9 @@ const limit = ref(50)
 const hasMore = ref(true)
 const total = ref(0)
 
+const route = useRoute()
+const router = useRouter()
+
 // Back to top
 const showBackToTop = ref(false)
 
@@ -158,6 +162,10 @@ const wordDetail = ref(null)
 const loadWords = async (page = 1) => {
   loading.value = true
   try {
+    // Cập nhật query param page trên URL nếu khác
+    if (page !== Number(route.query.page)) {
+      router.replace({ query: { ...route.query, page: page } })
+    }
     const offset = (page - 1) * limit.value
     const params = {
       keyword: searchKeyword.value || undefined,
@@ -303,7 +311,16 @@ const handleScroll = (event) => {
 
 // Lifecycle
 onMounted(() => {
-  loadWords(1)
+  // Lấy số trang từ URL nếu có
+  let pageFromUrl = 1
+  if (route.query.page) {
+    const parsed = parseInt(route.query.page)
+    if (!isNaN(parsed) && parsed > 0) {
+      pageFromUrl = parsed
+    }
+  }
+  currentPage.value = pageFromUrl
+  loadWords(pageFromUrl)
   // Add scroll listener to the scroll container
   const scrollContainer = document.querySelector('.vocabulary-scroll-container')
   if (scrollContainer) {
