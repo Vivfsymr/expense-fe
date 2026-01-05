@@ -318,13 +318,20 @@ const handleScroll = (event) => {
 
 // Lifecycle
 onMounted(() => {
-  // Lấy số trang từ URL nếu có
+  // Lấy filter và page từ URL nếu có
   let pageFromUrl = 1
   if (route.query.page) {
     const parsed = parseInt(route.query.page)
     if (!isNaN(parsed) && parsed > 0) {
       pageFromUrl = parsed
     }
+  }
+  // Ưu tiên lấy filter từ URL query param nếu có
+  if (typeof route.query.keyword === 'string') {
+    searchKeyword.value = route.query.keyword
+  }
+  if (typeof route.query.orderBy === 'string') {
+    orderBy.value = route.query.orderBy
   }
   currentPage.value = pageFromUrl
   loadWords(pageFromUrl)
