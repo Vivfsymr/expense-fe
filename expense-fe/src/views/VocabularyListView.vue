@@ -162,10 +162,17 @@ const wordDetail = ref(null)
 const loadWords = async (page = 1) => {
   loading.value = true
   try {
-    // Cập nhật query param page trên URL nếu khác
-    if (page !== Number(route.query.page)) {
-      router.replace({ query: { ...route.query, page: page } })
-    }
+    // Cập nhật query param page trên URL, giữ lại filter hiện tại
+    const newQuery = {
+      ...route.query,
+      page: page,
+    };
+    if (searchKeyword.value) newQuery.keyword = searchKeyword.value;
+    else delete newQuery.keyword;
+    if (orderBy.value) newQuery.orderBy = orderBy.value;
+    else delete newQuery.orderBy;
+    router.replace({ query: newQuery });
+
     const offset = (page - 1) * limit.value
     const params = {
       keyword: searchKeyword.value || undefined,
