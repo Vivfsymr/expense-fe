@@ -72,55 +72,61 @@
       <a-button type="primary" shape="circle" size="large">↑</a-button>
     </div>
 
-    <div v-if="showModal" class="modal-overlay" @click="closeModal">
-      <div class="modal-content" @click.stop>
-        <div class="modal-header">
-          <h2>Chi tiết từ vựng</h2>
-          <div class="header-actions">
-            <a-button
-              type="primary"
-              shape="circle"
-              class="speak-button"
-              @click="speakWord"
-              :disabled="!wordDetail"
-              title="Đọc từ vựng"
-            >
-              🔊
-            </a-button>
-            <a-button
-              :type="wordDetail && wordDetail.bookMark ? 'primary' : 'default'"
-              shape="circle"
-              class="bookmark-button"
-              @click="toggleBookmark"
-              :disabled="!wordDetail"
-              :title="wordDetail && wordDetail.bookMark ? 'Bỏ bookmark' : 'Bookmark từ này'"
-            >
-              <span v-if="wordDetail && wordDetail.bookMark">★</span>
-              <span v-else>☆</span>
-            </a-button>
-            <a-button
-              danger
-              shape="circle"
-              class="delete-btn"
-              @click="handleDeleteWord(wordDetail?._id)"
-              :disabled="!wordDetail"
-              title="Xoá từ này"
-            >🗑️</a-button>
-            <button @click="closeModal" class="close-btn" aria-label="Đóng">&times;</button>
+    <Teleport to="body">
+      <div
+        v-if="showModal"
+        class="vocab-detail-modal-overlay"
+        @click="closeModal"
+      >
+        <div class="vocab-detail-modal" @click.stop>
+          <div class="vocab-detail-modal__header">
+            <h2>Chi tiết từ vựng</h2>
+            <div class="vocab-detail-modal__actions">
+              <a-button
+                type="primary"
+                shape="circle"
+                class="speak-button"
+                @click="speakWord"
+                :disabled="!wordDetail"
+                title="Đọc từ vựng"
+              >
+                🔊
+              </a-button>
+              <a-button
+                :type="wordDetail && wordDetail.bookMark ? 'primary' : 'default'"
+                shape="circle"
+                class="bookmark-button"
+                @click="toggleBookmark"
+                :disabled="!wordDetail"
+                :title="wordDetail && wordDetail.bookMark ? 'Bỏ bookmark' : 'Bookmark từ này'"
+              >
+                <span v-if="wordDetail && wordDetail.bookMark">★</span>
+                <span v-else>☆</span>
+              </a-button>
+              <a-button
+                danger
+                shape="circle"
+                class="delete-btn"
+                @click="handleDeleteWord(wordDetail?._id)"
+                :disabled="!wordDetail"
+                title="Xoá từ này"
+              >🗑️</a-button>
+              <button @click="closeModal" class="vocab-detail-modal__close" aria-label="Đóng">&times;</button>
+            </div>
           </div>
-        </div>
-        <div class="modal-body">
-          <div v-if="loadingDetail" class="loading">
-            <a-spin size="large" />
-            <p>Đang tải chi tiết...</p>
+          <div class="vocab-detail-modal__body">
+            <div v-if="loadingDetail" class="vocab-detail-modal__loading">
+              <a-spin size="large" />
+              <p>Đang tải chi tiết...</p>
+            </div>
+            <div v-else-if="wordDetail" class="word-detail">
+              <div class="detail-content" v-html="formatWordContent(wordDetail.body)"></div>
+            </div>
+            <div v-else class="vocab-detail-modal__error">Không thể tải chi tiết từ vựng</div>
           </div>
-          <div v-else-if="wordDetail" class="word-detail">
-            <div class="detail-content" v-html="formatWordContent(wordDetail.body)"></div>
-          </div>
-          <div v-else class="error">Không thể tải chi tiết từ vựng</div>
         </div>
       </div>
-    </div>
+    </Teleport>
   </div>
 </template>
 
@@ -185,7 +191,7 @@ onUnmounted(() => {
   position: fixed;
   top: var(--app-header-height, 50px);
   left: 0;
-  z-index: 10;
+  z-index: 1;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   box-sizing: border-box;
 }
@@ -313,107 +319,11 @@ onUnmounted(() => {
   font-weight: 500;
 }
 
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  padding: 12px;
-  box-sizing: border-box;
-}
-
-.modal-content {
-  background: #1a1a1a;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  max-width: 600px;
-  width: 100%;
-  max-height: min(85vh, 85dvh);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  background: #2a2a2a;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-.modal-header h2 {
-  margin: 0;
-  color: #ffffff;
-  font-size: 15px;
-  white-space: nowrap;
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
-.speak-button {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border: none;
-}
-
-.close-btn {
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: rgba(255, 255, 255, 0.8);
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-}
-
-.modal-body {
-  padding: 14px 16px;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  background: #1a1a1a;
-  min-height: 0;
-}
-
-.detail-content {
-  font-size: 14px;
-  line-height: 1.6;
-  color: #ffffff;
-  word-wrap: break-word;
-}
-
-.error {
-  text-align: center;
-  color: #ff6b6b;
-  padding: 20px;
-}
-
 .back-to-top {
   position: fixed;
   bottom: 20px;
   right: 16px;
-  z-index: 1000;
-}
-
-.delete-btn {
-  background: #fff !important;
-  color: #c00 !important;
-  border: 1px solid #c00 !important;
+  z-index: 50;
 }
 
 @media (max-width: 768px) {
@@ -459,14 +369,6 @@ onUnmounted(() => {
     font-size: 14px;
   }
 
-  .modal-content {
-    max-height: min(92vh, 92dvh);
-  }
-
-  .modal-header h2 {
-    font-size: 14px;
-  }
-
   .pagination {
     padding-bottom: 16px;
   }
@@ -485,8 +387,124 @@ onUnmounted(() => {
     font-size: 13px;
     line-height: 1.35;
   }
+}
+</style>
 
-  .header-actions :deep(.ant-btn) {
+<!-- Unscoped: Teleport to body needs global classes to beat AppHeader z-index -->
+<style>
+.vocab-detail-modal-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 9999 !important;
+  background: rgba(0, 0, 0, 0.72);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: calc(var(--app-header-height, 50px) + 12px) 12px 16px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.vocab-detail-modal {
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  max-width: 600px;
+  width: 100%;
+  max-height: calc(100dvh - var(--app-header-height, 50px) - 28px);
+  max-height: calc(100vh - var(--app-header-height, 50px) - 28px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  margin-bottom: 12px;
+}
+
+.vocab-detail-modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: #2a2a2a;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.vocab-detail-modal__header h2 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.vocab-detail-modal__actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.vocab-detail-modal__actions .speak-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+}
+
+.vocab-detail-modal__actions .delete-btn {
+  background: #fff !important;
+  color: #c00 !important;
+  border: 1px solid #c00 !important;
+}
+
+.vocab-detail-modal__close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.8);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.vocab-detail-modal__body {
+  padding: 14px 16px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: #1a1a1a;
+  min-height: 0;
+  flex: 1;
+}
+
+.vocab-detail-modal__body .detail-content {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #ffffff;
+  word-wrap: break-word;
+}
+
+.vocab-detail-modal__loading {
+  text-align: center;
+  padding: 40px 20px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.vocab-detail-modal__error {
+  text-align: center;
+  color: #ff6b6b;
+  padding: 20px;
+}
+
+@media (max-width: 768px) {
+  .vocab-detail-modal__header h2 {
+    font-size: 14px;
+  }
+
+  .vocab-detail-modal__actions .ant-btn {
     width: 34px;
     height: 34px;
     min-width: 34px;

@@ -3,12 +3,20 @@
     <div class="header-left">
       <span class="header-title">Vocab</span>
     </div>
-    <a-menu mode="horizontal" :selectedKeys="[selectedKey]" class="header-menu" @click="onMenuClick">
-      <a-menu-item key="flashcard">Flashcard</a-menu-item>
-      <a-menu-item key="vocabulary">Từ vựng</a-menu-item>
-      <a-menu-item key="lookup">Tra nghĩa</a-menu-item>
-      <a-menu-item key="add-word">Thêm từ</a-menu-item>
-    </a-menu>
+
+    <nav class="header-nav" aria-label="Main">
+      <button
+        v-for="item in menuItems"
+        :key="item.key"
+        type="button"
+        class="nav-item"
+        :class="{ active: selectedKey === item.key }"
+        @click="go(item.path)"
+      >
+        {{ item.label }}
+      </button>
+    </nav>
+
     <div class="header-user" v-if="user">
       <a-avatar :size="avatarSize" class="header-avatar">
         {{ user?.name ? user.name.charAt(0) : '' }}
@@ -35,6 +43,13 @@ const route = useRoute()
 
 const isMobile = ref(false)
 
+const menuItems = [
+  { key: 'flashcard', label: 'Flashcard', path: '/flashcard' },
+  { key: 'vocabulary', label: 'Từ vựng', path: '/vocabulary' },
+  { key: 'lookup', label: 'Tra nghĩa', path: '/lookup' },
+  { key: 'add-word', label: 'Thêm từ', path: '/add-word' },
+]
+
 const updateIsMobile = () => {
   isMobile.value = window.innerWidth <= 768
 }
@@ -58,11 +73,8 @@ const selectedKey = computed(() => {
   return ''
 })
 
-const onMenuClick = (e: { key: string }) => {
-  if (e.key === 'flashcard') router.push('/flashcard')
-  if (e.key === 'vocabulary') router.push('/vocabulary')
-  if (e.key === 'lookup') router.push('/lookup')
-  if (e.key === 'add-word') router.push('/add-word')
+const go = (path: string) => {
+  router.push(path)
 }
 
 const logout = () => {
@@ -78,7 +90,7 @@ const logout = () => {
   align-items: center;
   justify-content: space-between;
   height: var(--app-header-height, 50px);
-  padding: 0 20px;
+  padding: 0 16px;
   position: fixed;
   top: 0;
   left: 0;
@@ -102,21 +114,41 @@ const logout = () => {
   white-space: nowrap;
 }
 
-.header-menu {
+.header-nav {
   flex: 1;
   min-width: 0;
-  margin: 0 12px;
-  background: transparent;
-  border-bottom: none;
-  line-height: var(--app-header-height, 50px);
+  display: flex;
+  align-items: center;
+  gap: 4px;
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x;
 }
 
-.header-menu::-webkit-scrollbar {
+.header-nav::-webkit-scrollbar {
   display: none;
+}
+
+.nav-item {
+  flex: 0 0 auto;
+  border: none;
+  background: transparent;
+  color: #fafafa;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.nav-item.active {
+  color: #69b1ff;
+  background: rgba(105, 177, 255, 0.12);
 }
 
 .header-user {
@@ -153,29 +185,15 @@ const logout = () => {
   display: none;
 }
 
-:deep(.ant-menu-item) {
-  color: #fafafa !important;
-  background: transparent !important;
-  padding-inline: 12px !important;
-}
-
-:deep(.ant-menu-item-selected) {
-  color: #69b1ff !important;
-}
-
 @media (max-width: 768px) {
   .app-header {
     padding: 0 8px;
-    gap: 4px;
+    gap: 6px;
   }
 
   .header-title {
     font-size: 14px;
     letter-spacing: 0;
-  }
-
-  .header-menu {
-    margin: 0 4px;
   }
 
   .header-username {
@@ -196,13 +214,9 @@ const logout = () => {
     height: 28px;
   }
 
-  :deep(.ant-menu-item) {
-    padding-inline: 8px !important;
-    font-size: 13px !important;
-  }
-
-  :deep(.ant-menu-overflow-item) {
-    padding-inline: 8px !important;
+  .nav-item {
+    font-size: 13px;
+    padding: 6px 10px;
   }
 }
 
@@ -211,9 +225,9 @@ const logout = () => {
     display: none;
   }
 
-  :deep(.ant-menu-item) {
-    padding-inline: 6px !important;
-    font-size: 12px !important;
+  .nav-item {
+    font-size: 12px;
+    padding: 6px 8px;
   }
 }
 </style>
