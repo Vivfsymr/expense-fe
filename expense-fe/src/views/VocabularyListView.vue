@@ -126,13 +126,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-<<<<<<< HEAD
 import { useVocabulary } from '../composables/useVocabulary'
 import { formatWordContent, toListPreview } from '../utils/formatWord'
-=======
-import { wordService } from '../services/wordService'
-import { useRoute, useRouter } from 'vue-router'
->>>>>>> d067f5e0f6217550fce796e626708636e77ab4c2
 
 const {
   words,
