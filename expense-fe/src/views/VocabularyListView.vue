@@ -126,8 +126,13 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
+<<<<<<< HEAD
 import { useVocabulary } from '../composables/useVocabulary'
 import { formatWordContent, toListPreview } from '../utils/formatWord'
+=======
+import { wordService } from '../services/wordService'
+import { useRoute, useRouter } from 'vue-router'
+>>>>>>> d067f5e0f6217550fce796e626708636e77ab4c2
 
 const {
   words,
@@ -152,15 +157,86 @@ const {
   scrollToTop,
 } = useVocabulary()
 
+<<<<<<< HEAD
 const isMobile = ref(false)
 
 const updateIsMobile = () => {
   isMobile.value = window.innerWidth <= 768
+=======
+const route = useRoute()
+const router = useRouter()
+
+// Back to top
+const showBackToTop = ref(false)
+
+// Modal
+const showModal = ref(false)
+const wordDetail = ref(null)
+
+// Methods
+const loadWords = async (page = 1) => {
+  loading.value = true
+  try {
+    // Cập nhật query param page trên URL, giữ lại filter hiện tại
+    const newQuery = {
+      ...route.query,
+      page: page,
+    };
+    if (searchKeyword.value) newQuery.keyword = searchKeyword.value;
+    else delete newQuery.keyword;
+    if (orderBy.value) newQuery.orderBy = orderBy.value;
+    else delete newQuery.orderBy;
+    router.replace({ query: newQuery });
+
+    const offset = (page - 1) * limit.value
+    const params = {
+      keyword: searchKeyword.value || undefined,
+      orderBy: orderBy.value || undefined,
+      offset: offset,
+      limit: limit.value
+    }
+    const response = await wordService.getWordSummary(params)
+    words.value = response.items || []
+    total.value = typeof response.total === 'number' ? response.total : words.value.length
+    currentPage.value = page
+    hasMore.value = words.value.length === limit.value
+  } catch (error) {
+    console.error('Error loading words:', error)
+    words.value = []
+  } finally {
+    loading.value = false
+  }
+>>>>>>> d067f5e0f6217550fce796e626708636e77ab4c2
 }
 
 onMounted(() => {
+<<<<<<< HEAD
   updateIsMobile()
   window.addEventListener('resize', updateIsMobile)
+=======
+  // Lấy filter và page từ URL nếu có
+  let pageFromUrl = 1
+  if (route.query.page) {
+    const parsed = parseInt(route.query.page)
+    if (!isNaN(parsed) && parsed > 0) {
+      pageFromUrl = parsed
+    }
+  }
+  // Ưu tiên lấy filter từ URL query param nếu có
+  if (typeof route.query.keyword === 'string') {
+    searchKeyword.value = route.query.keyword
+  }
+  if (typeof route.query.orderBy === 'string') {
+    orderBy.value = route.query.orderBy
+  }
+  currentPage.value = pageFromUrl
+  loadWords(pageFromUrl)
+  // Add scroll listener to the scroll container
+  const scrollContainer = document.querySelector('.vocabulary-scroll-container')
+  if (scrollContainer) {
+    scrollContainer.addEventListener('scroll', handleScroll)
+  }
+>>>>>>> d067f5e0f6217550fce796e626708636e77ab4c2
 })
 
 onUnmounted(() => {
