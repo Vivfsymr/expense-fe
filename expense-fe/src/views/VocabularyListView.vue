@@ -5,16 +5,16 @@
         <div class="search-filter">
           <a-input-search
             v-model:value="searchKeyword"
+            class="search-input"
             placeholder="Tìm kiếm từ vựng..."
             @search="handleSearch"
             @pressEnter="handleSearch"
-            style="width: 250px;"
             size="small"
           />
           <a-select
             v-model:value="orderBy"
+            class="sort-select"
             @change="handleSortChange"
-            style="width: 150px;"
             placeholder="Sắp xếp"
             size="small"
           >
@@ -27,8 +27,8 @@
             <a-select-option value="bookmark">Bookmark</a-select-option>
           </a-select>
         </div>
-        <div class="word-counter" v-if="words.length > 0">
-          {{ words.length }} từ (Trang {{ currentPage }})
+        <div class="word-counter" v-if="words.length > 0 || total > 0">
+          {{ words.length }} từ · Trang {{ currentPage }} · Tổng {{ total }}
         </div>
       </div>
     </div>
@@ -46,9 +46,8 @@
             :key="word._id"
             class="vocabulary-item"
           >
-            <div class="word-body" @click="showWordDetail(word._id)">{{ word.body }}</div>
+            <div class="word-body" @click="showWordDetail(word._id)">{{ toListPreview(word.body) }}</div>
           </div>
-
         </div>
 
         <div class="pagination" v-if="words.length > 0">
@@ -57,64 +56,57 @@
             :page-size="limit"
             :total="total"
             @change="onPageChange"
-            show-size-changer="false"
+            :show-size-changer="false"
             :show-less-items="true"
-            :show-quick-jumper="false"
-            style="margin: 0 auto;"
+            :simple="isMobile"
+            size="small"
           />
-          <span class="page-info">Trang {{ currentPage }} / {{ Math.ceil(total/limit) }}</span>
+          <span class="page-info" v-if="!isMobile">
+            Trang {{ currentPage }} / {{ Math.ceil(total / limit) || 1 }}
+          </span>
         </div>
       </div>
     </div>
 
-    <!-- Back to top button for scroll container -->
     <div class="back-to-top" v-if="showBackToTop" @click="scrollToTop">
-      <a-button type="primary" shape="circle" size="large">
-        ↑
-      </a-button>
+      <a-button type="primary" shape="circle" size="large">↑</a-button>
     </div>
 
-    <!-- Modal chi tiết từ vựng -->
     <div v-if="showModal" class="modal-overlay" @click="closeModal">
       <div class="modal-content" @click.stop>
         <div class="modal-header">
           <h2>Chi tiết từ vựng</h2>
           <div class="header-actions">
-            <a-button 
-              type="primary" 
-              shape="circle" 
-              size="large" 
-              class="speak-button" 
+            <a-button
+              type="primary"
+              shape="circle"
+              class="speak-button"
               @click="speakWord"
               :disabled="!wordDetail"
               title="Đọc từ vựng"
             >
               🔊
             </a-button>
-            <a-button 
+            <a-button
               :type="wordDetail && wordDetail.bookMark ? 'primary' : 'default'"
               shape="circle"
-              size="large"
               class="bookmark-button"
               @click="toggleBookmark"
               :disabled="!wordDetail"
               :title="wordDetail && wordDetail.bookMark ? 'Bỏ bookmark' : 'Bookmark từ này'"
-              style="margin-left: 8px;"
             >
               <span v-if="wordDetail && wordDetail.bookMark">★</span>
               <span v-else>☆</span>
             </a-button>
-            <a-button 
-               type="danger"
-              shape="circle" 
-              size="large" 
+            <a-button
+              danger
+              shape="circle"
               class="delete-btn"
               @click="handleDeleteWord(wordDetail?._id)"
               :disabled="!wordDetail"
               title="Xoá từ này"
-              style="margin-left: 8px;"
             >🗑️</a-button>
-            <button @click="closeModal" class="close-btn">&times;</button>
+            <button @click="closeModal" class="close-btn" aria-label="Đóng">&times;</button>
           </div>
         </div>
         <div class="modal-body">
@@ -132,190 +124,47 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { wordService } from '../services/wordService'
+import { useVocabulary } from '../composables/useVocabulary'
+import { formatWordContent, toListPreview } from '../utils/formatWord'
 
-// Reactive data
-const words = ref([])
-const loading = ref(false)
-const loadingDetail = ref(false)
-const searchKeyword = ref('')
-const orderBy = ref('')
-const currentPage = ref(1)
-const limit = ref(50)
-const hasMore = ref(true)
-const total = ref(0)
+const {
+  words,
+  loading,
+  loadingDetail,
+  searchKeyword,
+  orderBy,
+  currentPage,
+  limit,
+  total,
+  showBackToTop,
+  showModal,
+  wordDetail,
+  handleDeleteWord,
+  handleSearch,
+  toggleBookmark,
+  handleSortChange,
+  onPageChange,
+  showWordDetail,
+  closeModal,
+  speakWord,
+  scrollToTop,
+} = useVocabulary()
 
-// Back to top
-const showBackToTop = ref(false)
+const isMobile = ref(false)
 
-// Modal
-const showModal = ref(false)
-const wordDetail = ref(null)
-
-// Methods
-const loadWords = async (page = 1) => {
-  loading.value = true
-  try {
-    const offset = (page - 1) * limit.value
-    const params = {
-      keyword: searchKeyword.value || undefined,
-      orderBy: orderBy.value || undefined,
-      offset: offset,
-      limit: limit.value
-    }
-    const response = await wordService.getWordSummary(params)
-    words.value = response.items || []
-    total.value = typeof response.total === 'number' ? response.total : words.value.length
-    currentPage.value = page
-    hasMore.value = words.value.length === limit.value
-  } catch (error) {
-    console.error('Error loading words:', error)
-    words.value = []
-  } finally {
-    loading.value = false
-  }
+const updateIsMobile = () => {
+  isMobile.value = window.innerWidth <= 768
 }
 
-const handleDeleteWord = async (id) => {
-  if (!id) return;
-  if (!confirm('Bạn có chắc muốn xoá từ này?')) return;
-  try {
-    loading.value = true;
-    await wordService.deleteWord(id);
-    await loadWords(currentPage.value);
-    closeModal();
-  } catch (e) {
-    alert('Xoá thất bại!');
-  } finally {
-    loading.value = false;
-  }
-}
-
-const handleSearch = () => {
-  currentPage.value = 1
-  hasMore.value = true
-  loadWords(1)
-}
-
-const toggleBookmark = async () => {
-  if (!wordDetail.value || !wordDetail.value._id) return;
-  const newValue = !wordDetail.value.bookMark;
-  try {
-    await wordService.bookmarkWord(wordDetail.value._id, newValue);
-    wordDetail.value.bookMark = newValue;
-    window.$message
-      ? window.$message.success(newValue ? 'Đã bookmark!' : 'Đã bỏ bookmark!')
-      : alert(newValue ? 'Đã bookmark!' : 'Đã bỏ bookmark!');
-  } catch (e) {
-    window.$message
-      ? window.$message.error('Thao tác bookmark thất bại!')
-      : alert('Thao tác bookmark thất bại!');
-  }
-}
-
-const handleSortChange = () => {
-  currentPage.value = 1
-  hasMore.value = true
-  loadWords(1)
-}
-
-const onPageChange = (page) => {
-  loadWords(page)
-  scrollToTop()
-}
-
-const goToNextPage = () => {
-  if (!hasMore.value || loading.value) return
-  loadWords(currentPage.value + 1)
-  scrollToTop()
-}
-
-const goToPreviousPage = () => {
-  if (currentPage.value === 1 || loading.value) return
-  loadWords(currentPage.value - 1)
-  scrollToTop()
-}
-
-const showWordDetail = async (wordId) => {
-  showModal.value = true
-  loadingDetail.value = true
-  wordDetail.value = null
-  
-  try {
-    const detail = await wordService.getWordDetail(wordId)
-    wordDetail.value = detail
-  } catch (error) {
-    console.error('Error loading word detail:', error)
-  } finally {
-    loadingDetail.value = false
-  }
-}
-
-const closeModal = () => {
-  showModal.value = false
-  wordDetail.value = null
-}
-
-const formatWordContent = (content) => {
-  if (!content) return ''
-  return content.replace(/\\n/g, '<br>')
-}
-
-// 🟢 Hàm đọc từ tiếng Anh đầu tiên với giọng Anh-Mỹ
-const speakWord = () => {
-  if (!wordDetail.value || !wordDetail.value.body) return;
-
-  // Regex lấy từ tiếng Anh đầu tiên
-  const match = wordDetail.value.body.match(/[a-zA-Z]+/);
-  if (!match) return;
-
-  const wordToSpeak = match[0];
-  const utterance = new SpeechSynthesisUtterance(wordToSpeak);
-  
-  // Chỉ dùng giọng Anh-Mỹ
-  utterance.lang = 'en-US';
-  utterance.rate = 0.85; // Tốc độ vừa phải
-  utterance.pitch = 1.0; // Cao độ bình thường
-  utterance.volume = 0.9; // Âm lượng
-  
-  console.log(`🔊 Speaking "${wordToSpeak}" with American English voice`);
-  
-  speechSynthesis.speak(utterance);
-};
-
-// Back to top functionality
-const scrollToTop = () => {
-  const scrollContainer = document.querySelector('.vocabulary-scroll-container')
-  if (scrollContainer) {
-    scrollContainer.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    })
-  }
-}
-
-const handleScroll = (event) => {
-  const scrollContainer = event.target
-  showBackToTop.value = scrollContainer.scrollTop > 500
-}
-
-// Lifecycle
 onMounted(() => {
-  loadWords(1)
-  // Add scroll listener to the scroll container
-  const scrollContainer = document.querySelector('.vocabulary-scroll-container')
-  if (scrollContainer) {
-    scrollContainer.addEventListener('scroll', handleScroll)
-  }
+  updateIsMobile()
+  window.addEventListener('resize', updateIsMobile)
 })
 
 onUnmounted(() => {
-  const scrollContainer = document.querySelector('.vocabulary-scroll-container')
-  if (scrollContainer) {
-    scrollContainer.removeEventListener('scroll', handleScroll)
-  }
+  window.removeEventListener('resize', updateIsMobile)
 })
 </script>
 
@@ -325,30 +174,34 @@ onUnmounted(() => {
 }
 
 .vocabulary-list {
-  height: 100vh;
+  height: calc(100vh - var(--app-header-height, 50px));
+  height: calc(100dvh - var(--app-header-height, 50px));
   display: flex;
   flex-direction: column;
-  width: 100vw;
+  width: 100%;
+  max-width: 100vw;
   margin: 0;
   padding: 0;
   position: fixed;
-  top: 0;
+  top: var(--app-header-height, 50px);
   left: 0;
   z-index: 10;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-sizing: border-box;
 }
 
 .header {
   flex-shrink: 0;
   background: rgba(26, 26, 26, 0.9);
   backdrop-filter: blur(10px);
-  z-index: 100;
-  padding: 15px 20px 12px 20px;
+  z-index: 20;
+  padding: 12px 16px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  width: 100%;
+  box-sizing: border-box;
 }
 
 .content {
@@ -359,24 +212,20 @@ onUnmounted(() => {
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
+  min-height: 0;
 }
 
 .vocabulary-scroll-container {
   flex: 1;
   overflow-y: auto;
-  padding: 15px 20px 80px 20px;
-}
-
-.header h1 {
-  color: #ffffff;
-  margin: 0 0 12px 0;
-  font-size: 24px;
-  font-weight: 600;
+  -webkit-overflow-scrolling: touch;
+  padding: 12px 16px 80px;
+  min-height: 0;
 }
 
 .controls {
   display: flex;
-  gap: 15px;
+  gap: 12px;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
@@ -385,8 +234,19 @@ onUnmounted(() => {
 .search-filter {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.search-input {
+  width: 250px;
+  max-width: 100%;
+}
+
+.sort-select {
+  width: 150px;
 }
 
 .word-counter {
@@ -402,27 +262,23 @@ onUnmounted(() => {
   color: rgba(255, 255, 255, 0.8);
 }
 
-.loading p {
-  margin-top: 16px;
-  font-size: 16px;
-}
-
 .vocabulary-list-container {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 30px;
+  gap: 10px;
+  margin-bottom: 24px;
 }
 
 .vocabulary-item {
   background: #1a1a1a;
   border: none;
   border-radius: 8px;
-  padding: 16px 20px;
+  padding: 14px 16px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   width: 100%;
+  box-sizing: border-box;
 }
 
 .vocabulary-item:hover {
@@ -433,40 +289,40 @@ onUnmounted(() => {
 }
 
 .word-body {
-  font-size: 16px;
+  font-size: 15px;
   line-height: 1.5;
   color: #ffffff;
-  white-space: pre-line;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .pagination {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 30px;
-  padding: 20px 0;
-  gap: 12px;
+  margin-top: 16px;
+  padding: 12px 0 24px;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .page-info {
   color: rgba(255, 255, 255, 0.8);
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
-  padding: 0 16px;
 }
 
-/* Modal styles */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  padding: 12px;
+  box-sizing: border-box;
 }
 
 .modal-content {
@@ -474,9 +330,11 @@ onUnmounted(() => {
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   max-width: 600px;
-  width: 85%;
-  max-height: 85vh;
+  width: 100%;
+  max-height: min(85vh, 85dvh);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
@@ -484,39 +342,30 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 15px;
+  padding: 10px 12px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   background: #2a2a2a;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .modal-header h2 {
   margin: 0;
   color: #ffffff;
-  font-size: 16px;
+  font-size: 15px;
+  white-space: nowrap;
 }
 
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
 .speak-button {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border: none;
-  font-size: 14px;
-  transition: all 0.3s ease;
-}
-
-.speak-button:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-.speak-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
 }
 
 .close-btn {
@@ -525,181 +374,122 @@ onUnmounted(() => {
   font-size: 24px;
   cursor: pointer;
   color: rgba(255, 255, 255, 0.8);
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  transition: all 0.2s;
-}
-
-.close-btn:hover {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.1);
 }
 
 .modal-body {
-  padding: 15px 18px 18px 18px;
-  max-height: 70vh;
+  padding: 14px 16px;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   background: #1a1a1a;
+  min-height: 0;
 }
 
 .detail-content {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   font-size: 14px;
   line-height: 1.6;
   color: #ffffff;
-  margin: 0;
   word-wrap: break-word;
-  white-space: normal;
 }
 
 .error {
   text-align: center;
   color: #ff6b6b;
   padding: 20px;
-  font-size: 16px;
 }
 
-/* Back to top button */
 .back-to-top {
   position: fixed;
-  bottom: 30px;
-  right: 30px;
+  bottom: 20px;
+  right: 16px;
   z-index: 1000;
-  transition: opacity 0.3s ease;
 }
 
-.back-to-top .ant-btn {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  font-size: 18px;
-  font-weight: bold;
+.delete-btn {
+  background: #fff !important;
+  color: #c00 !important;
+  border: 1px solid #c00 !important;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
-  .vocabulary-list {
-    height: 100vh;
-  }
-
   .header {
-    padding: 15px;
-  }
-
-  .header h1 {
-    font-size: 24px;
-    margin-bottom: 15px;
+    padding: 10px 12px;
   }
 
   .controls {
     flex-direction: column;
     align-items: stretch;
-    gap: 15px;
-  }
-
-  .search-filter {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-  }
-
-  .search-filter .ant-input-search {
-    width: 100% !important;
-    margin-right: 0 !important;
-  }
-
-  .search-filter .ant-select {
-    width: 100% !important;
-    margin-right: 0 !important;
-  }
-
-  .vocabulary-scroll-container {
-    padding: 10px;
-  }
-
-  .vocabulary-list-container {
     gap: 8px;
   }
 
+  .search-filter {
+    display: grid;
+    grid-template-columns: 1fr 110px;
+    gap: 8px;
+  }
+
+  .search-input,
+  .sort-select {
+    width: 100% !important;
+  }
+
+  .word-counter {
+    text-align: right;
+    font-size: 12px;
+  }
+
+  .vocabulary-scroll-container {
+    padding: 10px 10px 72px;
+  }
+
   .vocabulary-item {
-    padding: 10px 12px;
+    padding: 12px;
+  }
+
+  .vocabulary-item:hover {
+    transform: none;
   }
 
   .word-body {
     font-size: 14px;
-    line-height: 1.4;
   }
 
   .modal-content {
-    width: 95%;
-    max-height: 92vh;
-    margin: 10px;
+    max-height: min(92vh, 92dvh);
   }
 
-  .modal-header {
-    padding: 15px;
+  .modal-header h2 {
+    font-size: 14px;
   }
 
-  .modal-body {
-    padding: 15px;
+  .pagination {
+    padding-bottom: 16px;
   }
 
-  .back-to-top {
-    bottom: 20px;
-    right: 20px;
+  :deep(.ant-pagination) {
+    color: #fff;
   }
 }
 
 @media (max-width: 480px) {
-  .vocabulary-list {
-    height: 100vh;
-  }
-  
-  .header h1 {
-    font-size: 20px;
-  }
-
-  .vocabulary-list-container {
-    gap: 6px;
-  }
-
-  .vocabulary-item {
-    padding: 8px 10px;
-    border-radius: 6px;
+  .search-filter {
+    grid-template-columns: 1fr;
   }
 
   .word-body {
     font-size: 13px;
-    line-height: 1.3;
+    line-height: 1.35;
   }
 
-  .vocabulary-scroll-container {
-    padding: 8px;
+  .header-actions :deep(.ant-btn) {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
   }
-
-  .header {
-    padding: 10px;
-  }
-
-  .controls {
-    gap: 10px;
-  }
-
-  .search-filter {
-    gap: 8px;
-  }
-}
-  .delete-btn {
-  background: #fff !important;
-  color: #c00 !important;
-  border: 1px solid #c00 !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
-  transition: background 0.2s;
-}
-.delete-btn:hover {
-  background: #c00 !important;
-  color: #fff !important;
 }
 </style>

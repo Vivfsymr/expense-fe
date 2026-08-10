@@ -1,13 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import LoginView from '../views/LoginView.vue';
-import RegisterView from '../views/RegisterView.vue';
+import LoginView from '../views/LoginView.vue'
+import RegisterView from '../views/RegisterView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      redirect: '/login'
+      redirect: '/login',
     },
     {
       path: '/login',
@@ -30,6 +30,11 @@ const router = createRouter({
       component: () => import('../views/VocabularyListView.vue'),
     },
     {
+      path: '/lookup',
+      name: 'lookup',
+      component: () => import('../views/LookupView.vue'),
+    },
+    {
       path: '/add-word',
       name: 'add-word',
       component: () => import('../views/AddWordView.vue'),
@@ -37,21 +42,24 @@ const router = createRouter({
   ],
 })
 
-router.beforeEach((to, from, next) => {
-  const publicPages = ['/login', '/register'];
-  const authRequired = !publicPages.includes(to.path);
-  const user = localStorage.getItem('user');
-  
+router.beforeEach((to, _from, next) => {
+  const publicPages = ['/login', '/register']
+  const authRequired = !publicPages.includes(to.path)
+  const user = localStorage.getItem('user')
+
   if (authRequired && !user) {
-    return next('/login');
+    return next('/login')
   }
-  
-  // Nếu đã đăng nhập và vào trang root, redirect đến vocabulary
+
   if (to.path === '/' && user) {
-    return next('/vocabulary');
+    return next('/vocabulary')
   }
-  
-  next();
-});
+
+  if ((to.path === '/login' || to.path === '/register') && user) {
+    return next('/vocabulary')
+  }
+
+  next()
+})
 
 export default router

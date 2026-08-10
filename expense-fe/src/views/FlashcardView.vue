@@ -4,21 +4,21 @@
       <a-spin size="large" />
       <p>Đang tải từ vựng...</p>
     </div>
-    
+
     <div v-else-if="words.length > 0" class="flashcard-wrapper">
       <div class="controls-top">
         <div class="search-filter">
           <a-input-search
             v-model:value="searchKeyword"
-            placeholder="Tìm kiếm từ vựng..."
+            class="search-input"
+            placeholder="Tìm kiếm..."
             @search="searchWords"
             @pressEnter="searchWords"
-            style="width: 200px; margin-right: 10px;"
           />
           <a-select
             v-model:value="sortOrder"
+            class="sort-select"
             @change="handleSortChange"
-            style="width: 150px;"
             placeholder="Sắp xếp"
           >
             <a-select-option value="newest">Mới nhất</a-select-option>
@@ -27,19 +27,21 @@
             <a-select-option value="beta">Z-A</a-select-option>
             <a-select-option value="random">Ngẫu nhiên</a-select-option>
           </a-select>
-          <a-button @click="goToPreviousPage" v-if="currentPage > 1" type="default" ghost style="margin-right: 8px;">
-            ← Trước
-          </a-button>
-          <a-button @click="goToNextPage" v-if="hasMore" type="default" ghost>
-            Tiếp →
-          </a-button>
+          <div class="page-nav">
+            <a-button @click="goToPreviousPage" v-if="currentPage > 1" type="default" ghost size="small">
+              ←
+            </a-button>
+            <a-button @click="goToNextPage" v-if="hasMore" type="default" ghost size="small">
+              →
+            </a-button>
+          </div>
         </div>
         <div class="card-counter">
-          {{ currentIndex + 1 }} / {{ words.length }} (Trang {{ currentPage }})
+          {{ currentIndex + 1 }}/{{ words.length }} · Trang {{ currentPage }} · Tổng {{ total }}
         </div>
       </div>
-      
-      <div 
+
+      <div
         class="flashcard"
         @touchstart="handleTouchStart"
         @touchmove="handleTouchMove"
@@ -47,13 +49,12 @@
       >
         <div class="card-inner">
           <div class="card-front" ref="cardFrontRef">
-            <!-- Nút xoá đã bị xoá, chỉ còn nút speak -->
-            <div class="word-content" v-html="formatWordContent(currentWord.body)"></div>
-            <a-button 
-              type="primary" 
-              shape="circle" 
-              size="large" 
-              class="speak-button" 
+            <div class="word-content" v-html="formatWordContent(currentWord?.body || '')"></div>
+            <a-button
+              type="primary"
+              shape="circle"
+              size="large"
+              class="speak-button"
               @click="speakWord"
             >
               🔊
@@ -62,7 +63,7 @@
         </div>
       </div>
     </div>
-    
+
     <div v-else class="no-data">
       <a-empty description="Không có từ vựng nào" />
     </div>
@@ -70,233 +71,39 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
-import { wordService, type Word, type WordQueryParams } from '../services/wordService';
-import dayjs from 'dayjs';
+import { useFlashcard } from '../composables/useFlashcard'
+import { formatWordContent } from '../utils/formatWord'
 
-const words = ref<Word[]>([]);
-const currentIndex = ref(0);
-const loading = ref(true);
-const searchKeyword = ref('');
-const sortOrder = ref<'alpha' | 'beta' | 'newest' | 'oldest' | 'random'>('newest');
-const currentPage = ref(1);
-const limit = ref(50);
-const hasMore = ref(true);
-const cardFrontRef = ref<HTMLDivElement | null>(null);
-
-// Touch handling for swipe
-const touchStartX = ref(0);
-const touchEndX = ref(0);
-const touchStartY = ref(0);
-const touchEndY = ref(0);
-
-const currentWord = computed(() => words.value[currentIndex.value]);
-
-// 🟢 Hàm đọc từ tiếng Anh đầu tiên với giọng Anh-Mỹ
-const speakWord = () => {
-  if (!currentWord.value || !currentWord.value.body) return;
-
-  // Regex lấy từ tiếng Anh đầu tiên
-  const match = currentWord.value.body.match(/[a-zA-Z]+/);
-  if (!match) return;
-
-  const wordToSpeak = match[0];
-  const utterance = new SpeechSynthesisUtterance(wordToSpeak);
-  
-  // Chỉ dùng giọng Anh-Mỹ
-  utterance.lang = 'en-US';
-  utterance.rate = 0.85; // Tốc độ vừa phải
-  utterance.pitch = 1.0; // Cao độ bình thường
-  utterance.volume = 0.9; // Âm lượng
-  
-  console.log(`🔊 Speaking "${wordToSpeak}" with American English voice`);
-  
-  speechSynthesis.speak(utterance);
-};
-
-const loadWords = async (page: number = 1) => {
-  try {
-    loading.value = true;
-    
-    const offset = (page - 1) * limit.value;
-    const params: WordQueryParams = {
-      orderBy: sortOrder.value,
-      offset: offset,
-      limit: limit.value
-    };
-    
-    if (searchKeyword.value.trim()) {
-      params.keyword = searchKeyword.value.trim();
-    }
-    
-    const data = await wordService.getWords(params);
-    
-    words.value = data; // Thay thế hoàn toàn, không cộng dồn
-    currentPage.value = page;
-    currentIndex.value = 0; // Reset về card đầu tiên
-    
-    hasMore.value = data.length === limit.value;
-  } catch (error) {
-    console.error('Error loading words:', error);
-  } finally {
-    loading.value = false;
-  }
-};
-
-
-// 2. Tạo hàm scroll to top
-const scrollToTop = () => {
-  if (cardFrontRef.value && cardFrontRef.value.scrollTo) {
-    cardFrontRef.value.scrollTo({
-      top: 0,
-      behavior: 'smooth' // Smooth scroll hoặc 'auto' cho instant
-    });
-  } else if (cardFrontRef.value) {
-    // Fallback cho browser cũ
-    cardFrontRef.value.scrollTop = 0;
-  }
-};
-
-const goToNextPage = async () => {
-  if (!hasMore.value) return;
-  await loadWords(currentPage.value + 1);
-  scrollToTop();
-};
-
-const goToPreviousPage = async () => {
-  if (currentPage.value === 1) return;
-  await loadWords(currentPage.value - 1);
-  scrollToTop();
-};
-
-const searchWords = async () => {
-  currentPage.value = 1;
-  await loadWords(1);
-};
-
-const handleSortChange = async () => {
-  currentPage.value = 1;
-  await loadWords(1);
-};
-
-const nextCard = () => {
-  if (currentIndex.value < words.value.length - 1) {
-    currentIndex.value++;
-    // Scroll to top sau khi chuyển card
-    setTimeout(() => {
-      scrollToTop();
-    }, 50); // Delay nhỏ để đảm bảo DOM đã update
-  }
-};
-
-const previousCard = () => {
-  if (currentIndex.value > 0) {
-    currentIndex.value--;
-    // Scroll to top sau khi chuyển card
-    setTimeout(() => {
-      scrollToTop();
-    }, 50); // Delay nhỏ để đảm bảo DOM đã update
-  }
-};
-
-const handleTouchStart = (e: TouchEvent) => {
-  touchStartX.value = e.touches[0].clientX;
-  touchStartY.value = e.touches[0].clientY;
-};
-
-const handleTouchMove = (e: TouchEvent) => {
-  // Không preventDefault để cho phép scroll dọc
-};
-
-const handleTouchEnd = (e: TouchEvent) => {
-  touchEndX.value = e.changedTouches[0].clientX;
-  touchEndY.value = e.changedTouches[0].clientY;
-  handleSwipe();
-};
-
-const handleSwipe = () => {
-  const swipeThreshold = 50;
-  const swipeDistanceX = touchStartX.value - touchEndX.value;
-  const swipeDistanceY = Math.abs(touchStartY.value - touchEndY.value);
-  
-  console.log('Swipe X:', swipeDistanceX, 'Swipe Y:', swipeDistanceY);
-  
-  // Chỉ xử lý swipe ngang nếu khoảng cách ngang > dọc
-  if (Math.abs(swipeDistanceX) > swipeThreshold && Math.abs(swipeDistanceX) > swipeDistanceY) {
-    if (swipeDistanceX > 0) {
-      // Swipe left - next card
-      console.log('Swiping to next card');
-      nextCard();
-    } else {
-      // Swipe right - previous card
-      console.log('Swiping to previous card');
-      previousCard();
-    }
-  }
-};
-
-const formatDate = (dateString: string) => {
-  return dayjs(dateString).format('DD/MM/YYYY HH:mm');
-};
-
-
-
-const formatWordContent = (content: string) => {
-  // Format the word content with better styling
-  return content
-    .replace(/\\n/g, '<br>') // Handle escaped newlines from API
-    .replace(/\n/g, '<br>') // Handle actual newlines
-    .replace(/\r\n/g, '<br>') // Handle Windows line endings
-    .replace(/\r/g, '<br>') // Handle Mac line endings
-    .replace(/✅/g, '<span class="check-mark">✅</span>')
-    .replace(/→/g, '<span class="arrow">→</span>')
-    .replace(/(\w+\s*\/[^\/]+\/)/g, '<span class="pronunciation">$1</span>')
-    .replace(/(\(noun\)|\(verb\)|\(adjective\)|\(adverb\))/gi, '<span class="word-type">$1</span>');
-};
-
-onMounted(() => {
-  loadWords(1);
-  
-  // Add keyboard support
-  const handleKeydown = (e: KeyboardEvent) => {
-    if (e.key === 'j' || e.key === 'J') {
-      // j = previous card (giống vim)
-      previousCard();
-    } else if (e.key === 'l' || e.key === 'L') {
-      // l = next card (giống vim)
-      nextCard();
-    }
-  };
-  
-  document.addEventListener('keydown', handleKeydown);
-  
-  // Cleanup
-  return () => {
-    document.removeEventListener('keydown', handleKeydown);
-  };
-});
+const {
+  words,
+  currentIndex,
+  loading,
+  searchKeyword,
+  sortOrder,
+  currentPage,
+  total,
+  hasMore,
+  cardFrontRef,
+  currentWord,
+  speakWord,
+  goToNextPage,
+  goToPreviousPage,
+  searchWords,
+  handleSortChange,
+  handleTouchStart,
+  handleTouchMove,
+  handleTouchEnd,
+} = useFlashcard()
 </script>
 
 <style scoped>
- /* Reset toàn bộ margin/padding mặc định */
-html, body {
-  margin: 0 !important;
-  padding: 0 !important;
-  height: 100%;
-  overflow: hidden; /* Ẩn scrollbar */
-}
-
-* {
-  box-sizing: border-box;
-}
-
-/* CSS DESKTOP - Bỏ viền trắng */
 .flashcard-container {
-  min-height: 100vh;
-  height: 100vh; /* Chiếm đủ chiều cao */
-  width: 100vw; /* Chiếm đủ chiều rộng */
-  position: fixed; /* Fix position để tránh scroll */
-  top: 0;
+  height: calc(100vh - var(--app-header-height, 50px));
+  height: calc(100dvh - var(--app-header-height, 50px));
+  width: 100%;
+  max-width: 100vw;
+  position: fixed;
+  top: var(--app-header-height, 50px);
   left: 0;
   display: flex;
   flex-direction: column;
@@ -306,7 +113,7 @@ html, body {
   margin: 0;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   box-sizing: border-box;
-  overflow: hidden; /* Ẩn overflow */
+  overflow: hidden;
 }
 
 .loading {
@@ -316,14 +123,15 @@ html, body {
 
 .flashcard-wrapper {
   width: 100%;
-  max-width: 600px;
+  max-width: 640px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  padding: 20px;
+  align-items: stretch;
+  gap: 12px;
+  padding: 16px;
   box-sizing: border-box;
-  height: 100vh; /* Chiếm đủ chiều cao */
+  height: 100%;
+  min-height: 0;
 }
 
 .controls-top {
@@ -332,31 +140,48 @@ html, body {
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 15px;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
 .search-filter {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.search-input {
+  width: 200px;
+}
+
+.sort-select {
+  width: 140px;
+}
+
+.page-nav {
+  display: flex;
+  gap: 6px;
 }
 
 .card-counter {
   color: white;
-  font-size: 16px; /* Giảm từ 18px */
+  font-size: 14px;
   font-weight: bold;
   background: rgba(255, 255, 255, 0.2);
-  padding: 8px 16px; /* Giảm từ 10px 20px */
-  border-radius: 20px;
+  padding: 6px 12px;
+  border-radius: 16px;
   backdrop-filter: blur(10px);
-  flex-shrink: 0; /* Không cho counter thu nhỏ */
+  flex-shrink: 0;
   white-space: nowrap;
 }
 
 .flashcard {
   width: 100%;
-  height: 900px;
+  flex: 1;
+  min-height: 0;
   perspective: 1000px;
   user-select: none;
 }
@@ -373,13 +198,14 @@ html, body {
   width: 100%;
   height: 100%;
   border-radius: 15px;
-  padding: 40px;
+  padding: 28px 24px 72px;
   display: flex;
   align-items: flex-start;
   justify-content: center;
   background: #1a1a1a;
   color: #ffffff;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   position: relative;
 }
 
@@ -389,6 +215,7 @@ html, body {
   text-align: left;
   width: 100%;
   color: #ffffff;
+  word-break: break-word;
 }
 
 .word-content :deep(.check-mark) {
@@ -416,220 +243,90 @@ html, body {
   border: 1px solid #404040;
 }
 
-.word-details {
-  text-align: left;
-  width: 100%;
-}
-
-.swipe-hint {
-  color: white;
-  font-size: 14px;
-  text-align: center;
-  opacity: 0.8;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 10px 15px;
-  border-radius: 20px;
-  backdrop-filter: blur(10px);
-}
-
 .no-data {
   background: #1a1a1a;
   color: #ffffff;
-  padding: 40px;
+  padding: 40px 24px;
   border-radius: 15px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  margin: 16px;
+  max-width: 90vw;
 }
 
-/* Speak button styles */
 .speak-button {
   position: absolute !important;
-  bottom: 20px !important;
-  right: 20px !important;
+  bottom: 16px !important;
+  right: 16px !important;
   z-index: 10;
   background: rgba(64, 169, 255, 0.9) !important;
   border: none !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(10px);
 }
 
-
-
-.speak-button:hover {
-  background: rgba(64, 169, 255, 1) !important;
-  transform: scale(1.05);
-}
-
-/* MOBILE RESPONSIVE - Bỏ viền trắng + Hiện tất cả controls trên 1 dòng */
 @media (max-width: 768px) {
-  .flashcard-container {
-    min-height: 100vh;
-    min-height: 100dvh; /* Dynamic viewport height */
-    height: 100vh;
-    height: 100dvh;
-    width: 100vw;
-    position: fixed;
-    top: 0;
-    left: 0;
-    padding: 0;
-    margin: 0;
-    overflow: hidden;
-  }
-  
   .flashcard-wrapper {
     padding: 10px;
-    max-width: 100%;
-    width: 100vw;
-    height: 100vh;
-    height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    box-sizing: border-box;
+    gap: 8px;
   }
-  
+
   .controls-top {
-    flex-shrink: 0;
-    flex-direction: row; /* Hiển thị ngang trên 1 dòng */
-    align-items: center;
-    justify-content: space-between; /* Căn đều 2 bên */
-    margin-bottom: 10px;
-    padding: 0 5px;
-    gap: 5px; /* Giảm gap để tiết kiệm không gian */
-    flex-wrap: nowrap; /* QUAN TRỌNG: Không cho xuống dòng */
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .search-filter {
     width: 100%;
-    overflow: hidden; /* Ẩn overflow nếu quá dài */
+    display: grid;
+    grid-template-columns: 1fr 100px auto;
+    gap: 6px;
+    align-items: center;
   }
-  
-  .flashcard {
-    height: calc(100dvh - 100px); /* Giảm trừ ít hơn vì controls gọn hơn */
-    flex: 1;
-    min-height: 500px;
+
+  .search-input {
+    width: 100% !important;
   }
-  
+
+  .sort-select {
+    width: 100% !important;
+  }
+
+  .page-nav {
+    justify-content: flex-end;
+  }
+
+  .card-counter {
+    align-self: flex-end;
+    font-size: 12px;
+    padding: 4px 10px;
+  }
+
   .card-front {
-    padding: 20px;
-    height: 100%;
+    padding: 16px 14px 64px;
   }
-  
+
   .word-content {
     font-size: 14px;
-    line-height: 1.4;
+    line-height: 1.45;
   }
-  
-  .search-filter {
-    display: flex;
-    align-items: center;
-    gap: 5px; /* Giảm gap để tiết kiệm không gian */
-    flex-wrap: nowrap; /* Không cho xuống dòng */
-    flex-shrink: 1; /* Cho phép thu nhỏ nếu cần */
-    min-width: 0; /* Cho phép thu nhỏ xuống 0 */
-  }
-  
-  /* Hiện lại search input trên mobile nhưng thu nhỏ */
-  .search-filter .ant-input-search {
-    display: block !important; /* Force hiển thị */
-    width: 90px !important; /* Thu nhỏ search box hơn nữa */
-    flex-shrink: 1;
-    min-width: 70px; /* Width tối thiểu */
-  }
-  
-  .search-filter .ant-input {
-    display: block !important; /* Force input bên trong */
-  }
-  
-  /* Thu nhỏ sort dropdown */
-  .search-filter .ant-select {
-    display: block !important; /* Force hiển thị */
-    width: 80px !important; /* Thu nhỏ dropdown hơn */
-    flex-shrink: 1;
-    min-width: 70px;
-  }
-  
-  /* Thu nhỏ nút Tải thêm */
-  .search-filter .ant-btn {
-    display: block !important; /* Force hiển thị */
-    padding: 4px 8px !important; /* Giảm padding */
-    font-size: 12px !important; /* Thu nhỏ font */
-    height: auto !important;
-    line-height: 1.2 !important;
-    flex-shrink: 0; /* Không cho thu nhỏ nút */
-    white-space: nowrap; /* Không xuống dòng */
-  }
-  
-  /* Hiện lại card counter nhưng thu nhỏ */
-  .card-counter {
-    display: block !important; /* Force hiển thị */
-    color: white;
-    font-size: 12px !important; /* Giảm font size nhiều hơn */
-    font-weight: bold;
-    background: rgba(255, 255, 255, 0.2);
-    padding: 4px 8px !important; /* Giảm padding nhiều hơn */
-    border-radius: 10px;
-    backdrop-filter: blur(10px);
-    white-space: nowrap; /* Không xuống dòng */
-    flex-shrink: 0; /* Không cho thu nhỏ counter */
-    visibility: visible !important; /* Force visible */
-    min-width: fit-content; /* Width vừa đủ nội dung */
-  }
-  
-  /* Speak button trên mobile */
+
   .speak-button {
-    position: absolute !important;
-    bottom: 20px !important;
-    right: 20px !important;
-    z-index: 10;
+    bottom: 12px !important;
+    right: 12px !important;
   }
 }
 
-/* Màn hình rất nhỏ - responsive hơn cho controls */
 @media (max-width: 480px) {
-  .flashcard {
-    height: calc(100dvh - 90px); /* Giảm trừ ít hơn */
+  .search-filter {
+    grid-template-columns: 1fr 88px auto;
   }
-  
-  .flashcard-container {
-    padding: 0;
-  }
-  
-  .flashcard-wrapper {
-    padding: 5px;
-  }
-  
-  .card-front {
-    padding: 15px;
-  }
-  
+
   .word-content {
-    font-size: 14px;
-    line-height: 1.4; /* Line height nhỏ hơn */
+    font-size: 13px;
   }
-  
-  /* Controls nhỏ hơn cho màn hình rất nhỏ */
-  .search-filter .ant-input-search {
-    display: block !important; /* Force hiển thị */
-    width: 80px !important; /* Thu nhỏ hơn nữa */
-  }
-  
-  .search-filter .ant-input {
-    display: block !important;
-  }
-  
-  .search-filter .ant-select {
-    display: block !important;
-    width: 70px !important;
-  }
-  
-  .search-filter .ant-btn {
-    display: block !important;
-    padding: 3px 6px !important; /* Giảm padding hơn nữa */
-    font-size: 11px !important; /* Thu nhỏ font hơn */
-  }
-  
-  .card-counter {
-    display: block !important;
-    font-size: 11px !important;
-    padding: 3px 6px !important;
-    visibility: visible !important;
+
+  .no-data {
+    padding: 24px 16px;
   }
 }
 </style>
