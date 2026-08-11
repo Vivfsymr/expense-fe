@@ -30,6 +30,11 @@ const router = createRouter({
       component: () => import('../views/VocabularyListView.vue'),
     },
     {
+      path: '/quiz',
+      name: 'quiz',
+      component: () => import('../views/QuizView.vue'),
+    },
+    {
       path: '/lookup',
       name: 'lookup',
       component: () => import('../views/LookupView.vue'),

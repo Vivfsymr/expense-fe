@@ -1,5 +1,11 @@
 import api from './client'
-import type { Word, WordLookupResult, WordQueryParams, WordSummaryPage } from '../types'
+import type {
+  Word,
+  WordLookupResult,
+  WordQueryParams,
+  WordQuizResult,
+  WordSummaryPage,
+} from '../types'
 
 function toQuery(params: WordQueryParams = {}): string {
   const query = new URLSearchParams()
@@ -65,5 +71,21 @@ export async function createFromAi(word: string): Promise<unknown> {
 
 export async function lookupWord(word: string): Promise<WordLookupResult> {
   const res = await api.post('/words/ai/lookup', { word: word.trim() })
+  return res.data
+}
+
+export async function getQuiz(params: {
+  keyword?: string
+  orderBy?: string
+  offset?: number
+  limit?: number
+} = {}): Promise<WordQuizResult> {
+  const query = new URLSearchParams()
+  if (params.keyword) query.append('keyword', params.keyword)
+  if (params.orderBy) query.append('orderBy', params.orderBy)
+  if (params.offset !== undefined) query.append('offset', String(params.offset))
+  if (params.limit !== undefined) query.append('limit', String(params.limit))
+  const qs = query.toString()
+  const res = await api.get(`/words/quiz${qs ? `?${qs}` : ''}`)
   return res.data
 }

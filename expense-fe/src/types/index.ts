@@ -41,3 +41,16 @@ export interface WordLookupResult {
   word: string
   body: string
 }
+
+export interface WordQuizItem {
+  id: string
+  english: string
+  vietnameseHint: string
+  partOfSpeech?: string
+  acceptedAnswers: string[]
+}
+
+export interface WordQuizResult {
+  total: number
+  items: WordQuizItem[]
+}

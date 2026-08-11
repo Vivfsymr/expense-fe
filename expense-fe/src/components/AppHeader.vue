@@ -46,6 +46,7 @@ const isMobile = ref(false)
 const menuItems = [
   { key: 'flashcard', label: 'Flashcard', path: '/flashcard' },
   { key: 'vocabulary', label: 'Từ vựng', path: '/vocabulary' },
+  { key: 'quiz', label: 'Luyện từ', path: '/quiz' },
   { key: 'lookup', label: 'Tra nghĩa', path: '/lookup' },
   { key: 'add-word', label: 'Thêm từ', path: '/add-word' },
 ]
@@ -68,6 +69,7 @@ const avatarSize = computed(() => (isMobile.value ? 28 : 32))
 const selectedKey = computed(() => {
   if (route.path.startsWith('/flashcard')) return 'flashcard'
   if (route.path.startsWith('/vocabulary')) return 'vocabulary'
+  if (route.path.startsWith('/quiz')) return 'quiz'
   if (route.path.startsWith('/lookup')) return 'lookup'
   if (route.path.startsWith('/add-word')) return 'add-word'
   return ''
