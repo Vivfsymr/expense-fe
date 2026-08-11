@@ -1,7 +1,7 @@
 <template>
   <div class="app-header">
-    <div class="header-left">
-      <span class="header-title">Vocab</span>
+    <div class="header-left" role="button" tabindex="0" @click="go('/flashcard')" @keydown.enter.prevent="go('/flashcard')">
+      <img class="header-logo" src="/favicon.svg" alt="" width="28" height="28" />
     </div>
 
     <nav class="header-nav" aria-label="Main">
@@ -105,6 +105,16 @@ const logout = () => {
 .header-left {
   display: flex;
   align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.header-logo {
+  width: 28px;
+  height: 28px;
+  display: block;
+  border-radius: 7px;
   flex-shrink: 0;
 }
 
@@ -191,6 +201,12 @@ const logout = () => {
   .app-header {
     padding: 0 8px;
     gap: 6px;
+  }
+
+  .header-logo {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
   }
 
   .header-title {

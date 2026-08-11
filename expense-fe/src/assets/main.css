@@ -16,10 +16,91 @@ body,
 
 :root {
   --app-header-height: 50px;
+  --app-bg: linear-gradient(135deg, #1c2255 0%);
 }
 
 @media (max-width: 768px) {
   :root {
     --app-header-height: 48px;
   }
+}
+
+.dark-pagination.ant-pagination,
+.dark-pagination .ant-pagination {
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.dark-pagination .ant-pagination-item {
+  min-width: 36px;
+  height: 36px;
+  line-height: 34px;
+  background: #2f2f2f;
+  border: 1px solid #555;
+  border-radius: 8px;
+}
+
+.dark-pagination .ant-pagination-item a {
+  color: #fff;
+}
+
+.dark-pagination .ant-pagination-item:hover {
+  border-color: #69b1ff;
+}
+
+.dark-pagination .ant-pagination-item:hover a {
+  color: #69b1ff;
+}
+
+.dark-pagination .ant-pagination-item-active {
+  background: #1677ff;
+  border-color: #1677ff;
+}
+
+.dark-pagination .ant-pagination-item-active a,
+.dark-pagination .ant-pagination-item-active:hover a {
+  color: #fff;
+}
+
+.dark-pagination .ant-pagination-prev .ant-pagination-item-link,
+.dark-pagination .ant-pagination-next .ant-pagination-item-link {
+  background: #2f2f2f;
+  border: 1px solid #555;
+  border-radius: 8px;
+  color: #fff;
+}
+
+.dark-pagination .ant-pagination-prev:hover .ant-pagination-item-link,
+.dark-pagination .ant-pagination-next:hover .ant-pagination-item-link {
+  border-color: #69b1ff;
+  color: #69b1ff;
+}
+
+.dark-pagination .ant-pagination-disabled .ant-pagination-item-link,
+.dark-pagination .ant-pagination-disabled:hover .ant-pagination-item-link {
+  background: #222;
+  border-color: #3a3a3a;
+  color: #777;
+}
+
+.dark-pagination .ant-pagination-item-ellipsis,
+.dark-pagination .ant-pagination-item-link-icon {
+  color: #fff !important;
+}
+
+.dark-pagination .ant-pagination-jump-prev .ant-pagination-item-container,
+.dark-pagination .ant-pagination-jump-next .ant-pagination-item-container {
+  color: #fff;
+}
+
+.dark-pagination .ant-pagination-simple-pager {
+  color: #fff;
+}
+
+.dark-pagination .ant-pagination-simple-pager input {
+  background: #2f2f2f;
+  border: 1px solid #555;
+  color: #fff;
+  font-weight: 600;
 }

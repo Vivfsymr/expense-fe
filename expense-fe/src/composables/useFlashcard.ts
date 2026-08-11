@@ -31,6 +31,34 @@ export function useFlashcard() {
     speakText(currentWord.value.body)
   }
 
+  const detailId = ref<string | null>(null)
+
+  const showDetail = () => {
+    if (!currentWord.value?._id) return
+    detailId.value = currentWord.value._id
+  }
+
+  const closeDetail = () => {
+    detailId.value = null
+  }
+
+  const onWordDeleted = async (id: string) => {
+    const remaining = words.value.filter((w) => w._id !== id)
+    words.value = remaining
+    total.value = Math.max(0, total.value - 1)
+
+    if (remaining.length === 0) {
+      const page = currentPage.value > 1 ? currentPage.value - 1 : 1
+      await loadWords(page)
+      return
+    }
+
+    if (currentIndex.value >= remaining.length) {
+      currentIndex.value = remaining.length - 1
+    }
+    scrollToTop()
+  }
+
   const scrollToTop = () => {
     if (cardFrontRef.value?.scrollTo) {
       cardFrontRef.value.scrollTo({ top: 0, behavior: 'smooth' })
@@ -153,6 +181,10 @@ export function useFlashcard() {
     cardFrontRef,
     currentWord,
     speakWord,
+    detailId,
+    showDetail,
+    closeDetail,
+    onWordDeleted,
     goToNextPage,
     goToPreviousPage,
     searchWords,

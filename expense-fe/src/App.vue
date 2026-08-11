@@ -23,7 +23,7 @@ const showHeader = computed(() => !publicPages.includes(route.path))
   min-height: 100dvh;
   width: 100%;
   max-width: 100vw;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  background: var(--app-bg) !important;
   overflow-x: hidden;
 }
 

@@ -2,7 +2,6 @@
   <div class="lookup-page">
     <div class="lookup-card">
       <h2 class="section-title">Tra nghĩa</h2>
-      <p class="section-desc">Tra từ bằng AI — chỉ xem, không lưu vào DB.</p>
 
       <form class="lookup-form" @submit.prevent="onLookup">
         <input
@@ -127,7 +126,7 @@ async function onSave() {
   width: 100%;
   max-width: 100vw;
   overflow-x: hidden;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--app-bg);
 }
 
 .lookup-card {
@@ -245,7 +244,7 @@ async function onSave() {
   height: 36px;
   border: none;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--app-bg);
   color: #fff;
   cursor: pointer;
   display: inline-flex;

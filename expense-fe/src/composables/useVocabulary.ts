@@ -1,14 +1,10 @@
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import * as wordsApi from '../api/words'
-import { useSpeech } from './useSpeech'
-import type { Word, WordSummary } from '../types'
+import type { WordSummary } from '../types'
 
 export function useVocabulary() {
-  const { speakText } = useSpeech()
-
   const words = ref<WordSummary[]>([])
   const loading = ref(false)
-  const loadingDetail = ref(false)
   const searchKeyword = ref('')
   const orderBy = ref('')
   const currentPage = ref(1)
@@ -16,8 +12,7 @@ export function useVocabulary() {
   const hasMore = ref(true)
   const total = ref(0)
   const showBackToTop = ref(false)
-  const showModal = ref(false)
-  const wordDetail = ref<Word | null>(null)
+  const detailId = ref<string | null>(null)
 
   const loadWords = async (page = 1) => {
     loading.value = true
@@ -41,37 +36,10 @@ export function useVocabulary() {
     }
   }
 
-  const handleDeleteWord = async (id?: string) => {
-    if (!id) return
-    if (!confirm('Bạn có chắc muốn xoá từ này?')) return
-    try {
-      loading.value = true
-      await wordsApi.deleteWord(id)
-      await loadWords(currentPage.value)
-      closeModal()
-    } catch {
-      alert('Xoá thất bại!')
-    } finally {
-      loading.value = false
-    }
-  }
-
   const handleSearch = () => {
     currentPage.value = 1
     hasMore.value = true
     loadWords(1)
-  }
-
-  const toggleBookmark = async () => {
-    if (!wordDetail.value?._id) return
-    const newValue = !wordDetail.value.bookMark
-    try {
-      await wordsApi.bookmarkWord(wordDetail.value._id, newValue)
-      wordDetail.value.bookMark = newValue
-      alert(newValue ? 'Đã bookmark!' : 'Đã bỏ bookmark!')
-    } catch {
-      alert('Thao tác bookmark thất bại!')
-    }
   }
 
   const handleSortChange = () => {
@@ -92,27 +60,16 @@ export function useVocabulary() {
     scrollToTop()
   }
 
-  const showWordDetail = async (wordId: string) => {
-    showModal.value = true
-    loadingDetail.value = true
-    wordDetail.value = null
-    try {
-      wordDetail.value = await wordsApi.getWordDetail(wordId)
-    } catch (error) {
-      console.error('Error loading word detail:', error)
-    } finally {
-      loadingDetail.value = false
-    }
+  const showWordDetail = (wordId: string) => {
+    detailId.value = wordId
   }
 
-  const closeModal = () => {
-    showModal.value = false
-    wordDetail.value = null
+  const closeDetail = () => {
+    detailId.value = null
   }
 
-  const speakWord = () => {
-    if (!wordDetail.value?.body) return
-    speakText(wordDetail.value.body)
+  const onWordDeleted = async () => {
+    await loadWords(currentPage.value)
   }
 
   const handleScroll = (event: Event) => {
@@ -136,23 +93,19 @@ export function useVocabulary() {
   return {
     words,
     loading,
-    loadingDetail,
     searchKeyword,
     orderBy,
     currentPage,
     limit,
     total,
     showBackToTop,
-    showModal,
-    wordDetail,
-    handleDeleteWord,
+    detailId,
     handleSearch,
-    toggleBookmark,
     handleSortChange,
     onPageChange,
     showWordDetail,
-    closeModal,
-    speakWord,
+    closeDetail,
+    onWordDeleted,
     scrollToTop,
   }
 }

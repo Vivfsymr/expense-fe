@@ -96,6 +96,7 @@
 
         <div class="pagination" v-if="total > 0">
           <a-pagination
+            class="dark-pagination"
             :current="currentPage"
             :page-size="limit"
             :total="total"
@@ -103,57 +104,24 @@
             :show-size-changer="false"
             :show-less-items="true"
             :simple="isMobile"
-            size="small"
           />
         </div>
       </div>
     </div>
 
-    <Teleport to="body">
-      <div
-        v-if="showModal"
-        class="vocab-detail-modal-overlay"
-        @click="closeDetail"
-      >
-        <div class="vocab-detail-modal" @click.stop>
-          <div class="vocab-detail-modal__header">
-            <h2>Chi tiết từ vựng</h2>
-            <div class="vocab-detail-modal__actions">
-              <a-button
-                type="primary"
-                shape="circle"
-                class="speak-button"
-                @click="speakDetail"
-                :disabled="!wordDetail"
-                title="Đọc từ vựng"
-              >
-                🔊
-              </a-button>
-              <button @click="closeDetail" class="vocab-detail-modal__close" aria-label="Đóng">&times;</button>
-            </div>
-          </div>
-          <div class="vocab-detail-modal__body">
-            <div v-if="loadingDetail" class="vocab-detail-modal__loading">
-              <a-spin size="large" />
-              <p>Đang tải chi tiết...</p>
-            </div>
-            <div v-else-if="wordDetail" class="word-detail">
-              <div class="detail-content" v-html="formatWordContent(wordDetail.body)"></div>
-            </div>
-            <div v-else class="vocab-detail-modal__error">Không thể tải chi tiết từ vựng</div>
-          </div>
-        </div>
-      </div>
-    </Teleport>
+    <WordDetailModal
+      :word-id="detailId"
+      @close="closeDetail"
+      @deleted="onWordDeleted"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, reactive, ref } from 'vue'
-import { getQuiz, getWordDetail } from '../api/words'
-import { formatWordContent } from '../utils/formatWord'
-import { useSpeech } from '../composables/useSpeech'
-import type { Word, WordQuizItem } from '../types'
+import { getQuiz } from '../api/words'
+import WordDetailModal from '../components/WordDetailModal.vue'
+import type { WordQuizItem } from '../types'
 
 type AnswerStatus = 'idle' | 'correct' | 'wrong'
 
@@ -164,8 +132,6 @@ interface QuizRow extends WordQuizItem {
   hintLevel: number
 }
 
-const { speakText } = useSpeech()
-
 const loading = ref(false)
 const error = ref('')
 const searchKeyword = ref('')
@@ -175,10 +141,7 @@ const limit = ref(50)
 const total = ref(0)
 const rows = reactive<QuizRow[]>([])
 const isMobile = ref(false)
-
-const showModal = ref(false)
-const loadingDetail = ref(false)
-const wordDetail = ref<Word | null>(null)
+const detailId = ref<string | null>(null)
 
 const correctCount = computed(() => rows.filter((r) => r.status === 'correct').length)
 
@@ -224,27 +187,22 @@ function statusClass(row: QuizRow) {
   return row.status
 }
 
-async function showDetail(id: string) {
-  showModal.value = true
-  loadingDetail.value = true
-  wordDetail.value = null
-  try {
-    wordDetail.value = await getWordDetail(id)
-  } catch (e) {
-    console.error('Error loading word detail:', e)
-  } finally {
-    loadingDetail.value = false
-  }
+function showDetail(id: string) {
+  detailId.value = id
 }
 
 function closeDetail() {
-  showModal.value = false
-  wordDetail.value = null
+  detailId.value = null
 }
 
-function speakDetail() {
-  if (!wordDetail.value?.body) return
-  speakText(wordDetail.value.body)
+async function onWordDeleted(id: string) {
+  const idx = rows.findIndex((r) => r.id === id)
+  if (idx >= 0) rows.splice(idx, 1)
+  total.value = Math.max(0, total.value - 1)
+  if (rows.length === 0 && total.value > 0) {
+    if (currentPage.value > 1) currentPage.value -= 1
+    await loadQuiz()
+  }
 }
 
 function handleSearch() {
@@ -320,7 +278,7 @@ onUnmounted(() => {
   width: 100%;
   max-width: 100vw;
   overflow-x: hidden;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--app-bg);
 }
 
 .quiz-card {

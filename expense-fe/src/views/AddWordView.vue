@@ -132,7 +132,7 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--app-bg);
 }
 
 .add-word-dark {

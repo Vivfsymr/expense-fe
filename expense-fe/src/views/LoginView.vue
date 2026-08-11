@@ -14,7 +14,6 @@
             <a-button type="primary" html-type="submit" :loading="loading" size="large" block>
               Đăng nhập
             </a-button>
-            <a-button type="link" @click="$router.push('/register')">Đăng ký</a-button>
           </div>
         </a-form-item>
         <a-alert v-if="error" type="error" :message="error" show-icon style="margin-top: 10px" />

@@ -50,15 +50,28 @@
         <div class="card-inner">
           <div class="card-front" ref="cardFrontRef">
             <div class="word-content" v-html="formatWordContent(currentWord?.body || '')"></div>
-            <a-button
-              type="primary"
-              shape="circle"
-              size="large"
-              class="speak-button"
-              @click="speakWord"
-            >
-              🔊
-            </a-button>
+            <div class="card-actions">
+              <a-button
+                type="primary"
+                shape="circle"
+                size="large"
+                class="speak-button"
+                @click="speakWord"
+                title="Đọc từ vựng"
+              >
+                🔊
+              </a-button>
+              <a-button
+                shape="circle"
+                size="large"
+                class="detail-button"
+                @click="showDetail"
+                :disabled="!currentWord"
+                title="Chi tiết từ vựng"
+              >
+                ℹ
+              </a-button>
+            </div>
           </div>
         </div>
       </div>
@@ -67,12 +80,19 @@
     <div v-else class="no-data">
       <a-empty description="Không có từ vựng nào" />
     </div>
+
+    <WordDetailModal
+      :word-id="detailId"
+      @close="closeDetail"
+      @deleted="onWordDeleted"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { useFlashcard } from '../composables/useFlashcard'
 import { formatWordContent } from '../utils/formatWord'
+import WordDetailModal from '../components/WordDetailModal.vue'
 
 const {
   words,
@@ -86,6 +106,10 @@ const {
   cardFrontRef,
   currentWord,
   speakWord,
+  detailId,
+  showDetail,
+  closeDetail,
+  onWordDeleted,
   goToNextPage,
   goToPreviousPage,
   searchWords,
@@ -111,7 +135,7 @@ const {
   justify-content: center;
   padding: 0;
   margin: 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--app-bg);
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -253,12 +277,24 @@ const {
   max-width: 90vw;
 }
 
-.speak-button {
-  position: absolute !important;
-  bottom: 16px !important;
-  right: 16px !important;
+.card-actions {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
   z-index: 10;
+  display: flex;
+  gap: 8px;
+}
+
+.speak-button {
   background: rgba(64, 169, 255, 0.9) !important;
+  border: none !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.detail-button {
+  background: #fff !important;
+  color: #333 !important;
   border: none !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
@@ -310,9 +346,9 @@ const {
     line-height: 1.45;
   }
 
-  .speak-button {
-    bottom: 12px !important;
-    right: 12px !important;
+  .card-actions {
+    bottom: 12px;
+    right: 12px;
   }
 }
 

@@ -52,6 +52,7 @@
 
         <div class="pagination" v-if="words.length > 0">
           <a-pagination
+            class="dark-pagination"
             :current="currentPage"
             :page-size="limit"
             :total="total"
@@ -59,7 +60,6 @@
             :show-size-changer="false"
             :show-less-items="true"
             :simple="isMobile"
-            size="small"
           />
           <span class="page-info" v-if="!isMobile">
             Trang {{ currentPage }} / {{ Math.ceil(total / limit) || 1 }}
@@ -72,89 +72,36 @@
       <a-button type="primary" shape="circle" size="large">↑</a-button>
     </div>
 
-    <Teleport to="body">
-      <div
-        v-if="showModal"
-        class="vocab-detail-modal-overlay"
-        @click="closeModal"
-      >
-        <div class="vocab-detail-modal" @click.stop>
-          <div class="vocab-detail-modal__header">
-            <h2>Chi tiết từ vựng</h2>
-            <div class="vocab-detail-modal__actions">
-              <a-button
-                type="primary"
-                shape="circle"
-                class="speak-button"
-                @click="speakWord"
-                :disabled="!wordDetail"
-                title="Đọc từ vựng"
-              >
-                🔊
-              </a-button>
-              <a-button
-                :type="wordDetail && wordDetail.bookMark ? 'primary' : 'default'"
-                shape="circle"
-                class="bookmark-button"
-                @click="toggleBookmark"
-                :disabled="!wordDetail"
-                :title="wordDetail && wordDetail.bookMark ? 'Bỏ bookmark' : 'Bookmark từ này'"
-              >
-                <span v-if="wordDetail && wordDetail.bookMark">★</span>
-                <span v-else>☆</span>
-              </a-button>
-              <a-button
-                danger
-                shape="circle"
-                class="delete-btn"
-                @click="handleDeleteWord(wordDetail?._id)"
-                :disabled="!wordDetail"
-                title="Xoá từ này"
-              >🗑️</a-button>
-              <button @click="closeModal" class="vocab-detail-modal__close" aria-label="Đóng">&times;</button>
-            </div>
-          </div>
-          <div class="vocab-detail-modal__body">
-            <div v-if="loadingDetail" class="vocab-detail-modal__loading">
-              <a-spin size="large" />
-              <p>Đang tải chi tiết...</p>
-            </div>
-            <div v-else-if="wordDetail" class="word-detail">
-              <div class="detail-content" v-html="formatWordContent(wordDetail.body)"></div>
-            </div>
-            <div v-else class="vocab-detail-modal__error">Không thể tải chi tiết từ vựng</div>
-          </div>
-        </div>
-      </div>
-    </Teleport>
+    <WordDetailModal
+      :word-id="detailId"
+      @close="closeDetail"
+      @deleted="onWordDeleted"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useVocabulary } from '../composables/useVocabulary'
-import { formatWordContent, toListPreview } from '../utils/formatWord'
+import { toListPreview } from '../utils/formatWord'
+import WordDetailModal from '../components/WordDetailModal.vue'
 
 const {
   words,
   loading,
-  loadingDetail,
   searchKeyword,
   orderBy,
   currentPage,
   limit,
   total,
   showBackToTop,
-  showModal,
-  wordDetail,
-  handleDeleteWord,
+  detailId,
   handleSearch,
-  toggleBookmark,
   handleSortChange,
   onPageChange,
   showWordDetail,
-  closeModal,
-  speakWord,
+  closeDetail,
+  onWordDeleted,
   scrollToTop,
 } = useVocabulary()
 
@@ -192,7 +139,7 @@ onUnmounted(() => {
   top: var(--app-header-height, 50px);
   left: 0;
   z-index: 1;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--app-bg);
   box-sizing: border-box;
 }
 

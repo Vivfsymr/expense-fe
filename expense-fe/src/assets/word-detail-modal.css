@@ -54,7 +54,7 @@
 }
 
 .vocab-detail-modal__actions .speak-button {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--app-bg);
   border: none;
 }
 
@@ -92,6 +92,31 @@
   line-height: 1.6;
   color: #ffffff;
   word-wrap: break-word;
+}
+
+.vocab-detail-modal__body .check-mark {
+  color: #52c41a;
+  font-weight: bold;
+}
+
+.vocab-detail-modal__body .arrow {
+  color: #40a9ff;
+  font-weight: bold;
+  margin: 0 5px;
+}
+
+.vocab-detail-modal__body .pronunciation {
+  color: #b37feb;
+  font-weight: bold;
+}
+
+.vocab-detail-modal__body .word-type {
+  background: #2a2a2a;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+  color: #d9d9d9;
+  border: 1px solid #404040;
 }
 
 .vocab-detail-modal__loading {
