@@ -24,7 +24,18 @@
 
       <div v-if="result" class="result-box">
         <div class="result-header">
-          <span class="result-word">{{ result.word }}</span>
+          <div class="result-title">
+            <span class="result-word">{{ result.word }}</span>
+            <button
+              class="speak-btn"
+              type="button"
+              title="Đọc từ vựng"
+              :disabled="!result.body"
+              @click="speakResult"
+            >
+              🔊
+            </button>
+          </div>
           <div class="result-actions">
             <span class="result-badge">{{ saved ? 'Đã lưu' : 'Chưa lưu' }}</span>
             <button
@@ -47,7 +58,10 @@
 import { ref } from 'vue'
 import { lookupWord, createFromForm } from '../api/words'
 import { formatWordContent, escapeString } from '../utils/formatWord'
+import { useSpeech } from '../composables/useSpeech'
 import type { WordLookupResult } from '../types'
+
+const { speakText } = useSpeech()
 
 const word = ref('')
 const loading = ref(false)
@@ -58,6 +72,11 @@ const saving = ref(false)
 const saved = ref(false)
 const saveSuccess = ref('')
 const saveError = ref('')
+
+function speakResult() {
+  if (!result.value?.body) return
+  speakText(result.value.body)
+}
 
 async function onLookup() {
   const value = word.value.trim()
@@ -209,9 +228,42 @@ async function onSave() {
   flex-wrap: wrap;
 }
 
+.result-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
 .result-word {
   font-size: 1.1rem;
   font-weight: 700;
+}
+
+.speak-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 16px;
+  line-height: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.speak-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.speak-btn:not(:disabled):active {
+  transform: scale(0.96);
 }
 
 .result-badge {

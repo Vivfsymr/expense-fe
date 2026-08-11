@@ -53,11 +53,11 @@
         </div>
 
         <div v-for="(row, index) in rows" :key="row.id" class="quiz-row">
-          <div class="hint-col">
+          <div class="hint-col" role="button" tabindex="0" @click="showDetail(row.id)" @keydown.enter.prevent="showDetail(row.id)">
             <span class="row-index">{{ (currentPage - 1) * limit + index + 1 }}.</span>
-            <button type="button" class="hint-text hint-btn" @click="showDetail(row.id)">
+            <div class="hint-text">
               {{ row.vietnameseHint }}
-            </button>
+            </div>
           </div>
 
           <div class="answer-col">
@@ -417,6 +417,13 @@ onUnmounted(() => {
   gap: 8px;
   align-items: flex-start;
   min-width: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: rgba(105, 177, 255, 0.25);
+  touch-action: manipulation;
+}
+
+.hint-col:active .hint-text {
+  color: #69b1ff;
 }
 
 .row-index {
@@ -428,26 +435,13 @@ onUnmounted(() => {
 .hint-text {
   line-height: 1.45;
   word-break: break-word;
-}
-
-.hint-btn {
-  border: none;
-  background: transparent;
-  color: inherit;
+  flex: 1;
+  min-width: 0;
   text-align: left;
-  padding: 0;
-  cursor: pointer;
-  font: inherit;
 }
 
-.hint-btn:hover {
+.hint-text:hover {
   color: #69b1ff;
-}
-
-.pos {
-  color: #b37feb;
-  font-weight: 600;
-  margin-right: 4px;
 }
 
 .answer-col {
